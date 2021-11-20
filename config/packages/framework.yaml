@@ -17,6 +17,15 @@ framework:
     php_errors:
         log: true
 
+    http_client:
+        scoped_clients:
+            harvest.client:
+                base_uri: 'https://api.harvestapp.com'
+                headers:
+                    Harvest-Account-ID: '%env(HARVEST_ACCOUNT_ID)%'
+                    Authorization: 'Bearer %env(HARVEST_API_TOKEN)%'
+                    User-Agent: 'Vendi Advertising - Time Reporting (chris@vendiadvertising.com)'
+
 when@test:
     framework:
         test: true
