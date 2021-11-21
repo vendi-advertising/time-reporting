@@ -108,6 +108,15 @@ class HarvestApiFetcher extends ApiFetcherBase
         return $this->getThings('/v2/projects', 'projects', fn($payload) => $this->transformProject($payload));
     }
 
+    public function getUserAssignmentsByUserId(int $userId): array
+    {
+        return $this->getThings(
+            "/v2/users/{$userId}/project_assignments",
+            'project_assignments',
+            fn($payload) => $payload['project']['id']
+        );
+    }
+
     private function transformUser(array $payload): User
     {
         return $this->entityMaker->createEntityFromApiPayload(User::class, $payload);

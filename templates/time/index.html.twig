@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Time{% endblock %}
+
+{% block body %}
+    {% for client in clients %}
+        <details>
+            <summary>{{ client.name }}</summary>
+            <ul>
+                {% for project in client.projects %}
+                    <li>{{ project.name }}</li>
+                {% endfor %}
+            </ul>
+        </details>
+    {% endfor %}
+{% endblock %}

@@ -19,6 +19,22 @@ class ClientRepository extends ServiceEntityRepository
         parent::__construct($registry, Client::class);
     }
 
+    public function findAllActiveClientsAndProjects()
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.projects', 'p')
+            ->addSelect('p')
+            ->andWhere('c.isActive = :v1')
+            ->andWhere('p.isActive = :v2')
+            ->setParameter('v1', true)
+            ->setParameter('v2', true)
+            ->addOrderBy('c.name')
+            ->addOrderBy('p.code')
+            ->addOrderBy('p.name')
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Client[] Returns an array of Client objects
     //  */

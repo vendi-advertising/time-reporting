@@ -6,6 +6,8 @@ use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
 use App\Repository\UserRepository;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -56,12 +58,16 @@ class User implements UserInterface
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?DateTimeInterface $harvestAccessTokenExpiration = null;
 
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'users')]
+    private $projects;
+
     public function __construct(int $id, string $firstName, string $lastName, string $email)
     {
         $this->id = $id;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
+        $this->projects = new ArrayCollection();
     }
 
     public function getFirstName(): string
@@ -225,4 +231,29 @@ class User implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection|Project[]
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): self
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects[] = $project;
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): self
+    {
+        $this->projects->removeElement($project);
+
+        return $this;
+    }
+
 }

@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
 use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
@@ -30,6 +32,9 @@ class Project
     #[ApiProperty]
     private ?float $budget = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'projects')]
+    private $users;
+
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)
     {
         $this->id = $id;
@@ -38,6 +43,7 @@ class Project
         $this->budget = $budget;
         $this->isActive = $isActive;
         $this->client = $client;
+        $this->users = new ArrayCollection();
     }
 
 
@@ -85,6 +91,33 @@ class Project
     public function setBudget(?float $budget): self
     {
         $this->budget = $budget;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeProject($this);
+        }
 
         return $this;
     }

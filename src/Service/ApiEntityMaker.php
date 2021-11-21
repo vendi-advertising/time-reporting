@@ -26,8 +26,11 @@ class ApiEntityMaker
         return $reflection;
     }
 
-    public function mapApiEntityToLocalEntity($remoteEntity, &$localEntity): void
+    public function mapApiEntityToLocalEntity($remoteEntity, &$localEntity = null): void
     {
+        if (null === $localEntity) {
+            $localEntity = Instantiator::instantiate($remoteEntity::class);
+        }
         $privateProperties = $this->getApiFieldAndValues($remoteEntity, $remoteEntity);
 
         $localReflector = $this->getReflectionClass($localEntity);
