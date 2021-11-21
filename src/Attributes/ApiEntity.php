@@ -8,7 +8,4 @@ use Attribute;
 class ApiEntity
 {
 
-    public function __construct()
-    {
-    }
 }

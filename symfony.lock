@@ -91,6 +91,15 @@
     "laminas/laminas-code": {
         "version": "4.4.3"
     },
+    "league/uri": {
+        "version": "6.5.0"
+    },
+    "league/uri-components": {
+        "version": "2.4.0"
+    },
+    "league/uri-interfaces": {
+        "version": "2.3.0"
+    },
     "monolog/monolog": {
         "version": "2.3.5"
     },
@@ -155,6 +164,9 @@
     },
     "psr/event-dispatcher": {
         "version": "1.0.0"
+    },
+    "psr/http-message": {
+        "version": "1.0.1"
     },
     "psr/link": {
         "version": "1.1.1"

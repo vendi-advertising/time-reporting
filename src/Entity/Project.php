@@ -2,19 +2,24 @@
 
 namespace App\Entity;
 
+use App\Attributes\ApiEntity;
+use App\Attributes\ApiProperty;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
+#[ApiEntity]
 class Project
 {
     use ExternalEntityIdTrait;
     use IsActiveTrait;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[ApiProperty]
     private string $name;
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[ApiProperty]
     private ?string $code = null;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: "projects")]
@@ -22,6 +27,7 @@ class Project
     private Client $client;
 
     #[ORM\Column(type: "decimal", precision: 10, scale: 2, nullable: true)]
+    #[ApiProperty]
     private ?float $budget = null;
 
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)

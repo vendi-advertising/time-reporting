@@ -24,7 +24,11 @@ framework:
                 headers:
                     Harvest-Account-ID: '%env(HARVEST_ACCOUNT_ID)%'
                     Authorization: 'Bearer %env(HARVEST_API_TOKEN)%'
-                    User-Agent: 'Vendi Advertising - Time Reporting (chris@vendiadvertising.com)'
+                    User-Agent: '%app.harvest.useragent%'
+            harvest.user.oauth:
+                base_uri: 'https://id.getharvest.com'
+                headers:
+                    User-Agent: '%app.harvest.useragent%'
 
 when@test:
     framework:

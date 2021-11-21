@@ -2,38 +2,67 @@
 
 namespace App\Entity;
 
+use App\Attributes\ApiEntity;
+use App\Attributes\ApiProperty;
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+#[ApiEntity]
+class User implements UserInterface
 {
     use ExternalEntityIdTrait;
     use IsActiveTrait;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[ApiProperty('first_name')]
     private string $firstName;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[ApiProperty('last_name')]
     private string $lastName;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[ApiProperty]
     private string $email;
 
     #[ORM\Column(type: "boolean")]
+    #[ApiProperty('is_admin')]
     private bool $isAdmin;
 
     #[ORM\Column(type: "boolean")]
+    #[ApiProperty('is_project_manager')]
     private bool $isProjectManager;
 
     #[ORM\Column(type: "integer")]
+    #[ApiProperty('weekly_capacity')]
     private int $weeklyCapacity;
 
     #[ORM\Column(type: "string", length: 1024, nullable: true)]
+    #[ApiProperty('is_admin')]
     private ?string $avatarUrl = null;
 
     #[ORM\Column(type: "simple_array", nullable: true)]
     private array $roles = [];
+
+    #[ORM\Column(type: 'string', length: 1024, nullable: true)]
+    private ?string $harvestAccessToken = null;
+
+    #[ORM\Column(type: 'string', length: 1024, nullable: true)]
+    private ?string $harvestRefreshToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?DateTimeInterface $harvestAccessTokenExpiration = null;
+
+    public function __construct(int $id, string $firstName, string $lastName, string $email)
+    {
+        $this->id = $id;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->email = $email;
+    }
 
     public function getFirstName(): string
     {
@@ -121,12 +150,78 @@ class User
 
     public function getRoles(): array
     {
-        return $this->roles;
+        $roles = $this->roles;
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getPassword()
+    {
+        return null;
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUsername()
+    {
+        return $this->email;
+    }
+
+    public function getUserIdentifier()
+    {
+        return $this->email;
+    }
+
+    public function getHarvestAccessToken(): ?string
+    {
+        return $this->harvestAccessToken;
+    }
+
+    public function setHarvestAccessToken(?string $harvestAccessToken): self
+    {
+        $this->harvestAccessToken = $harvestAccessToken;
+
+        return $this;
+    }
+
+    public function getHarvestRefreshToken(): ?string
+    {
+        return $this->harvestRefreshToken;
+    }
+
+    public function setHarvestRefreshToken(?string $harvestRefreshToken): self
+    {
+        $this->harvestRefreshToken = $harvestRefreshToken;
+
+        return $this;
+    }
+
+    public function getHarvestAccessTokenExpiration(): ?DateTimeInterface
+    {
+        return $this->harvestAccessTokenExpiration;
+    }
+
+    public function setHarvestAccessTokenExpiration(?DateTimeInterface $harvestAccessTokenExpiration): self
+    {
+        $this->harvestAccessTokenExpiration = $harvestAccessTokenExpiration;
 
         return $this;
     }

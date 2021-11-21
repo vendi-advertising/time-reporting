@@ -1,0 +1,34 @@
+<?php
+
+namespace App\DTO;
+
+use App\Exception\InvalidAuthorizationException;
+
+class HarvestTokens
+{
+    public string $accessToken;
+    public string $refreshToken;
+    public int $expiresIn;
+
+    public function __construct(string $accessToken, string $refreshToken, int $expiresIn)
+    {
+        $this->accessToken = $accessToken;
+        $this->refreshToken = $refreshToken;
+        $this->expiresIn = $expiresIn;
+    }
+
+    public static function fromApiResponse(array $response): self
+    {
+        foreach (['access_token', 'refresh_token', 'expires_in'] as $requiredKey) {
+            if (!array_key_exists($requiredKey, $response)) {
+                throw new InvalidAuthorizationException();
+            }
+        }
+
+        return new self(
+            accessToken: $response['access_token'],
+            refreshToken: $response['refresh_token'],
+            expiresIn: (int)$response['expires_in']
+        );
+    }
+}
