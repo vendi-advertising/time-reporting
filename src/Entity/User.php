@@ -154,6 +154,19 @@ class User implements UserInterface
         return $this;
     }
 
+    public function fixRoles(): void
+    {
+        if ($this->isAdmin) {
+            $this->roles[] = 'ROLE_ADMIN';
+        }
+
+        if ($this->isProjectManager) {
+            $this->roles[] = 'ROLE_PROJECT_MANAGER';
+        }
+
+        $this->roles = array_unique($this->roles);
+    }
+
     public function getRoles(): array
     {
         $roles = $this->roles;

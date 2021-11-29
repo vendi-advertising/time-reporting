@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TimeController extends AbstractController
 {
-    #[Route('/time', name: 'time')]
+    #[Route('/app/time', name: 'time')]
     public function index(ClientRepository $clientRepository): Response
     {
         return $this->render(

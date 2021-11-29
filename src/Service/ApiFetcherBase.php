@@ -14,9 +14,9 @@ abstract class ApiFetcherBase
         $this->httpClient = $httpClient;
     }
 
-    protected function getThings(string $url, string $key, callable $transformer, array $options = []): array
+    protected function getThings(string $url, string $key, callable $transformer, array $options = [], int $perPage = 100): array
     {
-        $responses = $this->getPagedResponses($url, $options);
+        $responses = $this->getPagedResponses($url, $perPage, $options);
         $things = [];
         foreach ($responses as $response) {
             foreach ($response[$key] as $thing) {
@@ -27,10 +27,9 @@ abstract class ApiFetcherBase
         return $things;
     }
 
-    protected function getPagedResponses(string $url, array $options = []): array
+    protected function getPagedResponses(string $url, int $perPage, array $options = []): array
     {
         $page = 1;
-        $perPage = 100;
 
         $hasMorePages = true;
         $responses = [];

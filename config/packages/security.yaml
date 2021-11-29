@@ -17,6 +17,7 @@ security:
         main:
             lazy: true
             provider: users_in_memory
+            custom_authenticator: App\Security\HarvestAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -28,4 +29,4 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/app/, roles: ROLE_USER }

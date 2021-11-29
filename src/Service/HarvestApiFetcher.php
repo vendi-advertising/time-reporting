@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\DTO\HarvestTokens;
+use App\DTO\ProjectBudget;
 use App\Entity\Client;
 use App\Entity\Project;
 use App\Entity\User;
@@ -47,10 +48,31 @@ class HarvestApiFetcher extends ApiFetcherBase
         );
     }
 
-    private function loadThings(callable $remoteGetter, callable $localGetter,): void
+    public function loadProjectBudgets(): void
+    {
+        $projectBudgets = $this->getProjectBudgets();
+        $allProjects = $this->projectRepository->findAll();
+        foreach ($projectBudgets as $projectBudget) {
+            foreach ($allProjects as $project) {
+                if ($project->getId() === $projectBudget->projectId) {
+                    $project->setBudgetRemaining($projectBudget->budgetRemaining);
+                    $project->setBudgetSpent($projectBudget->budgetSpent);
+                    $project->setBudgetBy($projectBudget->budgetBy);
+                    $project->setBudgetIsMonthly($projectBudget->budgetIsMonthly);
+                    $this->manager->persist($project);
+                    break;
+                }
+            }
+        }
+
+        $this->manager->flush();
+    }
+
+    private function loadThings(callable $remoteGetter, callable $localGetter): void
     {
         $allRemoteThings = $remoteGetter();
         $allLocalThings = $localGetter();
+
         foreach ($allRemoteThings as $remoteThing) {
             $foundLocal = false;
             foreach ($allLocalThings as $localThing) {
@@ -83,12 +105,28 @@ class HarvestApiFetcher extends ApiFetcherBase
 
         $userFromHarvest = $this->transformUser($responseArray);
         $userFromDatabase = $this->userRepository->find($userFromHarvest->getId());
+
+        // TODO: How can this happen?
+        if ($userFromDatabase) {
+            return null;
+        }
+
         $this->entityMaker->mapApiEntityToLocalEntity($userFromHarvest, $userFromDatabase);
+
+        $userFromDatabase->fixRoles();
 
         $this->manager->persist($userFromDatabase);
         $this->manager->flush();
 
         return $userFromDatabase;
+    }
+
+    /**
+     * @return ProjectBudget[]
+     */
+    public function getProjectBudgets(): array
+    {
+        return $this->getThings('/v2/reports/project_budget', 'results', fn($payload) => $this->transformProjectBudget($payload), perPage: 1000);
     }
 
     /**
@@ -115,6 +153,11 @@ class HarvestApiFetcher extends ApiFetcherBase
             'project_assignments',
             fn($payload) => $payload['project']['id']
         );
+    }
+
+    public function transformProjectBudget(array $payload): ProjectBudget
+    {
+        return $this->entityMaker->createEntityFromApiPayload(ProjectBudget::class, $payload);
     }
 
     private function transformUser(array $payload): User

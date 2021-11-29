@@ -12,6 +12,9 @@ parameters:
 services:
     # default configuration for services in *this* file
     _defaults:
+        bind:
+            $harvestAccountId: '%app.harvest.account_id%'
+            $harvestOAuthClientId: '%app.harvest.oauth.client_id%'
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 

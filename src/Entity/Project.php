@@ -35,6 +35,19 @@ class Project
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'projects')]
     private $users;
 
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    #[ApiProperty('budget_is_monthly')]
+    public ?bool $budgetIsMonthly;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    public ?string $budgetBy;
+
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2, nullable: true)]
+    public ?float $budgetSpent;
+
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2, nullable: true)]
+    public ?float $budgetRemaining;
+
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)
     {
         $this->id = $id;
@@ -120,5 +133,45 @@ class Project
         }
 
         return $this;
+    }
+
+    public function getBudgetSpent(): ?float
+    {
+        return $this->budgetSpent;
+    }
+
+    public function getBudgetRemaining(): ?float
+    {
+        return $this->budgetRemaining;
+    }
+
+    public function setBudgetRemaining(?float $budgetRemaining): void
+    {
+        $this->budgetRemaining = $budgetRemaining;
+    }
+
+    public function setBudgetSpent(?float $budgetSpent): void
+    {
+        $this->budgetSpent = $budgetSpent;
+    }
+
+    public function getBudgetBy(): ?string
+    {
+        return $this->budgetBy;
+    }
+
+    public function setBudgetBy(?string $budgetBy): void
+    {
+        $this->budgetBy = $budgetBy;
+    }
+
+    public function isBudgetIsMonthly(): ?bool
+    {
+        return $this->budgetIsMonthly;
+    }
+
+    public function setBudgetIsMonthly(?bool $budgetIsMonthly): void
+    {
+        $this->budgetIsMonthly = $budgetIsMonthly;
     }
 }
