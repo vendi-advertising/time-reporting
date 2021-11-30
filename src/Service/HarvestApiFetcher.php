@@ -107,7 +107,7 @@ class HarvestApiFetcher extends ApiFetcherBase
         $userFromDatabase = $this->userRepository->find($userFromHarvest->getId());
 
         // TODO: How can this happen?
-        if ($userFromDatabase) {
+        if (!$userFromDatabase) {
             return null;
         }
 

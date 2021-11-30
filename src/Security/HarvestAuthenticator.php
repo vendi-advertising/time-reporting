@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Service\HarvestApiFetcher;
 use App\Service\HarvestOauth;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,14 +27,16 @@ class HarvestAuthenticator extends AbstractAuthenticator
     private EntityManagerInterface $manager;
     private RouterInterface $router;
     private int $harvestAccountId;
+    private LoggerInterface $logger;
 
-    public function __construct(HarvestOauth $harvestOauth, HarvestApiFetcher $fetcher, EntityManagerInterface $manager, RouterInterface $router, int $harvestAccountId)
+    public function __construct(HarvestOauth $harvestOauth, HarvestApiFetcher $fetcher, EntityManagerInterface $manager, RouterInterface $router, int $harvestAccountId, LoggerInterface $logger)
     {
         $this->harvestOauth = $harvestOauth;
         $this->fetcher = $fetcher;
         $this->manager = $manager;
         $this->router = $router;
         $this->harvestAccountId = $harvestAccountId;
+        $this->logger = $logger;
     }
 
     public function supports(Request $request): ?bool
@@ -74,7 +77,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
 
                     // TODO: This can throw for stale authorization code
                     $tokens = $this->harvestOauth->getTokens($identifier);
-                    // $userId = $harvestOauth->getUserId($tokens);
+                    $this->logger->debug('Tokens');
                     $user = $this->fetcher->getUser($tokens);
 
                     if (!$user) {
@@ -110,7 +113,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        dd('failure');
+        dd($exception, 'failure');
     }
 
 //    public function start(Request $request, AuthenticationException $authException = null): Response

@@ -3,8 +3,9 @@
 namespace App\DTO;
 
 use App\Exception\InvalidAuthorizationException;
+use Stringable;
 
-class HarvestTokens
+class HarvestTokens implements Stringable
 {
     public string $accessToken;
     public string $refreshToken;
@@ -30,5 +31,10 @@ class HarvestTokens
             refreshToken: $response['refresh_token'],
             expiresIn: (int)$response['expires_in']
         );
+    }
+
+    public function __toString()
+    {
+        return "Access: {$this->accessToken}; Refresh: {$this->refreshToken}; Expires: {$this->expiresIn}";
     }
 }
