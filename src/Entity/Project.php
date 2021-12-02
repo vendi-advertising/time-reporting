@@ -48,6 +48,9 @@ class Project
     #[ORM\Column(type: "decimal", precision: 10, scale: 2, nullable: true)]
     public ?float $budgetRemaining;
 
+    #[ORM\ManyToOne(targetEntity: ProjectCategory::class, inversedBy: 'project')]
+    private ProjectCategory $projectCategory;
+
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)
     {
         $this->id = $id;
@@ -173,5 +176,17 @@ class Project
     public function setBudgetIsMonthly(?bool $budgetIsMonthly): void
     {
         $this->budgetIsMonthly = $budgetIsMonthly;
+    }
+
+    public function getProjectCategory(): ?ProjectCategory
+    {
+        return $this->projectCategory;
+    }
+
+    public function setProjectCategory(?ProjectCategory $projectCategory): self
+    {
+        $this->projectCategory = $projectCategory;
+
+        return $this;
     }
 }

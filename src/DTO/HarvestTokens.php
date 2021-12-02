@@ -3,6 +3,9 @@
 namespace App\DTO;
 
 use App\Exception\InvalidAuthorizationException;
+use DateInterval;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Stringable;
 
 class HarvestTokens implements Stringable
@@ -31,6 +34,13 @@ class HarvestTokens implements Stringable
             refreshToken: $response['refresh_token'],
             expiresIn: (int)$response['expires_in']
         );
+    }
+
+    public function getExpirationDateTime(): DateTimeInterface
+    {
+        $now = new DateTimeImmutable();
+
+        return $now->add(new DateInterval('PT'.$this->expiresIn.'S'));
     }
 
     public function __toString()

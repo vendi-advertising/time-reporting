@@ -3,26 +3,22 @@
 namespace App\Service;
 
 use App\DTO\HarvestTokens;
+use App\Entity\User;
 use App\Exception\InvalidAuthorizationException;
-use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HarvestOauth
 {
 
     private HttpClientInterface $httpClient;
-    private ParameterBagInterface $parameterBag;
-    private UserRepository $userRepository;
-    private EntityManagerInterface $manager;
+    private string $harvestOAuthClientId;
+    private string $harvestOAuthClientSecret;
 
-    public function __construct(HttpClientInterface $harvestUserOauth, ParameterBagInterface $parameterBag, UserRepository $userRepository, EntityManagerInterface $manager)
+    public function __construct(HttpClientInterface $harvestUserOauth, string $harvestOAuthClientId, string $harvestOAuthClientSecret)
     {
         $this->httpClient = $harvestUserOauth;
-        $this->parameterBag = $parameterBag;
-        $this->userRepository = $userRepository;
-        $this->manager = $manager;
+        $this->harvestOAuthClientId = $harvestOAuthClientId;
+        $this->harvestOAuthClientSecret = $harvestOAuthClientSecret;
     }
 
     public function getUserId(HarvestTokens $harvestTokens): ?int
@@ -45,6 +41,27 @@ class HarvestOauth
         return (int)$responseAsArray['user']['id'];
     }
 
+    public function refreshTokens(User $user): HarvestTokens
+    {
+        $response = $this->httpClient->request(
+            'POST',
+            '/api/v2/oauth2/token',
+            [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'body' => [
+                    'refresh_token' => $user->getHarvestRefreshToken(),
+                    'client_id' => $this->harvestOAuthClientId,
+                    'client_secret' => $this->harvestOAuthClientSecret,
+                    'grant_type' => 'refresh_token',
+                ],
+            ]
+        );
+
+        return HarvestTokens::fromApiResponse($response->toArray());
+    }
+
     public function getTokens(string $authorizationCode): HarvestTokens
     {
         $response = $this->httpClient->request(
@@ -56,8 +73,8 @@ class HarvestOauth
                 ],
                 'body' => [
                     'code' => $authorizationCode,
-                    'client_id' => $this->parameterBag->get('app.harvest.oauth.client_id'),
-                    'client_secret' => $this->parameterBag->get('app.harvest.oauth.client_secret'),
+                    'client_id' => $this->harvestOAuthClientId,
+                    'client_secret' => $this->harvestOAuthClientSecret,
                     'grant_type' => 'authorization_code',
                 ],
             ]
@@ -65,14 +82,4 @@ class HarvestOauth
 
         return HarvestTokens::fromApiResponse($response->toArray());
     }
-
-    /*
-curl -X POST \
-  -H "User-Agent: MyApp (yourname@example.com)" \
-  -d "code=$AUTHORIZATION_CODE" \
-  -d "client_id=$CLIENT_ID" \
-  -d "client_secret=$CLIENT_SECRET" \
-  -d "grant_type=authorization_code" \
-  'https://id.getharvest.com/api/v2/oauth2/token'
-     */
 }

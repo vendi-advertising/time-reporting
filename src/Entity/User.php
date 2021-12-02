@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
+use App\DTO\HarvestTokens;
 use App\Repository\UserRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -204,7 +205,7 @@ class User implements UserInterface
         return $this->email;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->email;
     }
@@ -269,4 +270,10 @@ class User implements UserInterface
         return $this;
     }
 
+    public function setAccessTokens(HarvestTokens $tokens): void
+    {
+        $this->setHarvestAccessToken($tokens->accessToken);
+        $this->setHarvestRefreshToken($tokens->refreshToken);
+        $this->setHarvestAccessTokenExpiration($tokens->getExpirationDateTime());
+    }
 }

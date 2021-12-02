@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -44,7 +45,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
         return $request->getPathInfo() === '/auth';
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $code = $request->get('code');
         $scopes = explode(' ', $request->get('scope'));
@@ -102,7 +103,10 @@ class HarvestAuthenticator extends AbstractAuthenticator
                     return true;
                 },
                 ''
-            )
+            ),
+            [
+                (new RememberMeBadge())->enable(),
+            ]
         );
     }
 
