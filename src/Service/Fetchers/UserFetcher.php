@@ -9,7 +9,7 @@ use App\Service\ApiEntityMaker;
 use App\Service\HarvestApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UserFetcher extends AbstractFetcher
+final class UserFetcher extends AbstractFetcher
 {
 
     private UserRepository $userRepository;
@@ -20,14 +20,17 @@ class UserFetcher extends AbstractFetcher
         $this->userRepository = $userRepository;
     }
 
-    public function load()
+    public function load(): void
     {
-
+        $this->loadThings(
+            fn() => $this->fetch(),
+            fn() => $this->userRepository->findAll()
+        );
     }
 
     public function fetch(): array
     {
-
+        return $this->getThings('/v2/users', 'users', fn($payload) => $this->transform($payload));
     }
 
     public function transform(array $payload): User

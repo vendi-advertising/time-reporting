@@ -4,7 +4,7 @@ namespace App\Service\Fetchers;
 
 interface FetcherInterface
 {
-    public function load();
+    public function load(): void;
 
     public function fetch(): array;
 

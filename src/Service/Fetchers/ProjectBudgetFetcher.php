@@ -18,7 +18,7 @@ final class ProjectBudgetFetcher extends AbstractFetcher
         $this->projectRepository = $projectRepository;
     }
 
-    public function load()
+    public function load(): void
     {
         $projectBudgets = $this->fetch();
         $allProjects = $this->projectRepository->findAll();

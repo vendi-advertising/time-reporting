@@ -2,6 +2,7 @@
 
 namespace App\Service\Fetchers;
 
+use App\Exception\TimeReportingException;
 use App\Service\ApiEntityMaker;
 use App\Service\HarvestApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,19 +60,36 @@ abstract class AbstractFetcher implements FetcherInterface
         $allLocalThings = $localGetter();
 
         foreach ($allRemoteThings as $remoteThing) {
-            $foundLocal = false;
+
+            $localToBeUpdated = null;
             foreach ($allLocalThings as $localThing) {
-                if ($localThing->getId() === $remoteThing->getId()) {
-                    $foundLocal = true;
+                if ($this->areRemoteAndLocalSame($remoteThing, $localThing)) {
+                    $localToBeUpdated = $localThing;
                     break;
                 }
             }
 
-            if (!$foundLocal) {
+            if ($localToBeUpdated) {
+                $this->entityMaker->mapApiEntityToLocalEntity($remoteThing, $localToBeUpdated);
+                $this->manager->persist($localToBeUpdated);
+            } else {
                 $this->manager->persist($remoteThing);
             }
         }
 
         $this->manager->flush();
+    }
+
+    protected function areRemoteAndLocalSame(object $remoteThing, object $localThing): bool
+    {
+        if (!method_exists($remoteThing, 'getId')) {
+            throw new TimeReportingException('Could not compare remote object, method getId() not found');
+        }
+
+        if (!method_exists($localThing, 'getId')) {
+            throw new TimeReportingException('Could not compare local object, method getId() not found');
+        }
+
+        return $localThing->getId() === $remoteThing->getId();
     }
 }

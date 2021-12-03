@@ -1,29 +1,30 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Harvest\Import;
 
-use App\Service\Fetchers\ClientFetcher;
+use App\Service\Fetchers\ProjectFetcher;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:harvest:import:clients', description: 'Import clients from Harvest')]
-class HarvestImportClientsCommand extends Command
+#[AsCommand(name: 'app:harvest:import:projects', description: 'Import projects from Harvest')]
+class Projects extends Command
 {
-    private ClientFetcher $clientFetcher;
 
-    public function __construct(ClientFetcher $clientFetcher)
+    private ProjectFetcher $fetcher;
+
+    public function __construct(ProjectFetcher $fetcher)
     {
         parent::__construct();
-        $this->clientFetcher = $clientFetcher;
+        $this->fetcher = $fetcher;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $this->clientFetcher->load();
+        $this->fetcher->load();
         $io->success('Done');
 
         return Command::SUCCESS;

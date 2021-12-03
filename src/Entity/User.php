@@ -44,7 +44,7 @@ class User implements UserInterface
     private int $weeklyCapacity;
 
     #[ORM\Column(type: "string", length: 1024, nullable: true)]
-    #[ApiProperty('is_admin')]
+    #[ApiProperty('avatar_url')]
     private ?string $avatarUrl = null;
 
     #[ORM\Column(type: "simple_array", nullable: true)]

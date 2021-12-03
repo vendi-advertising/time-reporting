@@ -23,7 +23,7 @@ final class ProjectFetcher extends AbstractFetcher
         $this->clientRepository = $clientRepository;
     }
 
-    public function load()
+    public function load(): void
     {
         $this->loadThings(
             fn() => $this->fetch(),
