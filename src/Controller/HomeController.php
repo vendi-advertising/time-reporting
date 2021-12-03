@@ -12,7 +12,7 @@ class HomeController extends AbstractController
     #[Route('/', name: 'home')]
     public function index(HarvestApiFetcher $fetcher): Response
     {
-        dump($fetcher->getUserAssignmentsByUserId(309800));
+        //dump($fetcher->getUserAssignmentsByUserId(309800));
 
 //        dump($clientRepository->findAllActiveClientsAndProjects());
 

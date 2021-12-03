@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Service\Fetchers\UserFetcher;
 use App\Service\HarvestApiFetcher;
 use App\Service\HarvestOauth;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,8 +30,9 @@ class HarvestAuthenticator extends AbstractAuthenticator
     private RouterInterface $router;
     private int $harvestAccountId;
     private LoggerInterface $logger;
+    private UserFetcher $userFetcher;
 
-    public function __construct(HarvestOauth $harvestOauth, HarvestApiFetcher $fetcher, EntityManagerInterface $manager, RouterInterface $router, int $harvestAccountId, LoggerInterface $logger)
+    public function __construct(HarvestOauth $harvestOauth, HarvestApiFetcher $fetcher, EntityManagerInterface $manager, RouterInterface $router, int $harvestAccountId, LoggerInterface $logger, UserFetcher $userFetcher)
     {
         $this->harvestOauth = $harvestOauth;
         $this->fetcher = $fetcher;
@@ -38,6 +40,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
         $this->router = $router;
         $this->harvestAccountId = $harvestAccountId;
         $this->logger = $logger;
+        $this->userFetcher = $userFetcher;
     }
 
     public function supports(Request $request): ?bool
@@ -79,7 +82,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
                     // TODO: This can throw for stale authorization code
                     $tokens = $this->harvestOauth->getTokens($identifier);
                     $this->logger->debug('Tokens');
-                    $user = $this->fetcher->getUser($tokens);
+                    $user = $this->userFetcher->getUserByToken($tokens);
 
                     if (!$user) {
                         throw new UserNotFoundException('Could not find user');
