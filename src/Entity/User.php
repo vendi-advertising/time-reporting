@@ -39,6 +39,10 @@ class User implements UserInterface
     #[ApiProperty('is_project_manager')]
     private bool $isProjectManager;
 
+    #[ORM\Column(type: "boolean")]
+    #[ApiProperty('is_contractor')]
+    private bool $isContractor;
+
     #[ORM\Column(type: "integer")]
     #[ApiProperty('weekly_capacity')]
     private int $weeklyCapacity;

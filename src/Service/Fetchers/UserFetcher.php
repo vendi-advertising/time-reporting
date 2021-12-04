@@ -9,7 +9,7 @@ use App\Service\ApiEntityMaker;
 use App\Service\HarvestApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class UserFetcher extends AbstractFetcher
+final class UserFetcher extends AbstractUpdatedSinceFetcher
 {
 
     private UserRepository $userRepository;

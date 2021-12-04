@@ -8,7 +8,7 @@ use App\Service\ApiEntityMaker;
 use App\Service\HarvestApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class ClientFetcher extends AbstractFetcher
+final class ClientFetcher extends AbstractUpdatedSinceFetcher
 {
     private ClientRepository $clientRepository;
 

@@ -10,7 +10,7 @@ use App\Service\HarvestApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
-final class ProjectFetcher extends AbstractFetcher
+final class ProjectFetcher extends AbstractUpdatedSinceFetcher
 {
 
     private ProjectRepository $projectRepository;

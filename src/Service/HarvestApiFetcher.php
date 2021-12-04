@@ -2,15 +2,18 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class HarvestApiFetcher
 {
     private HttpClientInterface $harvestClient;
+    private LoggerInterface $logger;
 
-    public function __construct(HttpClientInterface $harvestClient)
+    public function __construct(HttpClientInterface $harvestClient, LoggerInterface $logger)
     {
         $this->harvestClient = $harvestClient;
+        $this->logger = $logger;
     }
 
 //    public function getUserAssignmentsByUserId(int $userId): array
@@ -37,6 +40,7 @@ final class HarvestApiFetcher
 
     public function getPagedResponses(string $url, int $perPage, array $options = []): array
     {
+        $this->logger->debug('Call to getPagedResponses', ['url' => $url, 'per-page' => $perPage, 'option' => $options]);
         $page = 1;
 
         $hasMorePages = true;

@@ -78,6 +78,10 @@ abstract class AbstractFetcher implements FetcherInterface
         }
 
         $this->manager->flush();
+
+        if ($this instanceof AbstractUpdatedSinceFetcher) {
+            $this->setLastSync();
+        }
     }
 
     protected function areRemoteAndLocalSame(object $remoteThing, object $localThing): bool
