@@ -1,0 +1,27 @@
+<form action="{{ path('admin_project_categories_save') }}" method="post">
+    <input type="hidden" name="token" value="{{ csrf_token(csrf_token_name) }}"/>
+    {% if project_category is defined %}
+        <input type="hidden" name="project-category-id" value="{{ project_category.id }}"/>
+    {% endif %}
+    <h1>
+        {% if project_category is defined %}
+            Edit project category
+        {% else %}
+            Add new project category
+        {% endif %}
+    </h1>
+    <label>
+        Project category name
+        <input type="text" name="project-category-name" required
+               value="{{ project_category is defined ? project_category.name : '' }}"/>
+    </label>
+    <br/>
+    <label>
+        Sort order
+
+        <input type="number" name="sort-order" required
+               value="{{ project_category is defined ? project_category.sortOrder : 0 }}"/>
+    </label>
+    <br/>
+    <input type="submit" value="Submit"/>
+</form>

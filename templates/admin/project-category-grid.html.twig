@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include('includes/flash-messages.html.twig') %}
+    <form method="post">
+        <input type="submit" value="Submit"/>
+        <input type="hidden" name="token" value="{{ csrf_token(csrf_token_name) }}"/>
+        <table border="1">
+            <thead>
+            <tr>
+                <td></td>
+                <th>Billable</th>
+                {% for pc in project_categories %}
+                    <th>{{ pc.name }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for client in clients %}
+                <tr>
+                    <td><strong>{{ client.name }}</strong></td>
+                    <td><input name="client:{{ client.id }}" value="billable" type="radio"/></td>
+                    {% for pc in project_categories %}
+                        <td><input name="client:{{ client.id }}" value="pc:{{ pc.id }}" type="radio"/></td>
+                    {% endfor %}
+                </tr>
+                {% for project in client.projects %}
+                    <tr>
+                        <td>{{ project.name }}</td>
+                        <td><input name="client:{{ project.id }}" value="billable" type="radio"/></td>
+                        {% for pc in project_categories %}
+                            <td><input name="project:{{ project.id }}" value="pc:{{ pc.id }}" type="radio"/></td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Submit"/>
+    </form>
+{% endblock %}

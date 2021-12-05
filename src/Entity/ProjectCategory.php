@@ -19,14 +19,14 @@ class ProjectCategory
     private string $name;
 
     #[ORM\OneToMany(mappedBy: 'projectCategory', targetEntity: Project::class)]
-    private Collection $project;
+    private Collection $projects;
 
     #[ORM\Column(type: 'integer')]
     private int $sortOrder;
 
     public function __construct(string $name, int $sortOrder = 10000)
     {
-        $this->project = new ArrayCollection();
+        $this->projects = new ArrayCollection();
         $this->name = $name;
         $this->sortOrder = $sortOrder;
     }
@@ -51,15 +51,15 @@ class ProjectCategory
     /**
      * @return Collection|Project[]
      */
-    public function getProject(): Collection
+    public function getProjects(): Collection
     {
-        return $this->project;
+        return $this->projects;
     }
 
     public function addProject(Project $project): self
     {
-        if (!$this->project->contains($project)) {
-            $this->project[] = $project;
+        if (!$this->projects->contains($project)) {
+            $this->projects[] = $project;
             $project->setProjectCategory($this);
         }
 
@@ -68,7 +68,7 @@ class ProjectCategory
 
     public function removeProject(Project $project): self
     {
-        if ($this->project->removeElement($project)) {
+        if ($this->projects->removeElement($project)) {
             // set the owning side to null (unless already changed)
             if ($project->getProjectCategory() === $this) {
                 $project->setProjectCategory(null);

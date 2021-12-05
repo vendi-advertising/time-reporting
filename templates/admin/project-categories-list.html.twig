@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include('includes/flash-messages.html.twig') %}
+    <ul>
+        {% for pc in project_categories %}
+            <li><a href="{{ path('admin_project_category_edit', {'projectCategory': pc.id}) }}">{{ pc.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% include('admin/macro-project-category-form.html.twig') %}
+{% endblock %}

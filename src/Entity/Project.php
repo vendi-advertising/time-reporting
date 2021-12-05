@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ApiEntity]
+#[ApiEntity([Client::class])]
 class Project
 {
     use ExternalEntityIdTrait;
@@ -48,8 +48,11 @@ class Project
     #[ORM\Column(type: "decimal", precision: 10, scale: 2, nullable: true)]
     public ?float $budgetRemaining;
 
-    #[ORM\ManyToOne(targetEntity: ProjectCategory::class, inversedBy: 'project')]
+    #[ORM\ManyToOne(targetEntity: ProjectCategory::class, inversedBy: 'projects')]
     private ProjectCategory $projectCategory;
+
+    #[ORM\ManyToMany(targetEntity: ProjectTask::class, mappedBy: 'project')]
+    private $projectTasks;
 
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)
     {
@@ -60,6 +63,7 @@ class Project
         $this->isActive = $isActive;
         $this->client = $client;
         $this->users = new ArrayCollection();
+        $this->projectTasks = new ArrayCollection();
     }
 
 
@@ -186,6 +190,33 @@ class Project
     public function setProjectCategory(?ProjectCategory $projectCategory): self
     {
         $this->projectCategory = $projectCategory;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProjectTask[]
+     */
+    public function getProjectTasks(): Collection
+    {
+        return $this->projectTasks;
+    }
+
+    public function addProjectTask(ProjectTask $projectTask): self
+    {
+        if (!$this->projectTasks->contains($projectTask)) {
+            $this->projectTasks[] = $projectTask;
+            $projectTask->addProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectTask(ProjectTask $projectTask): self
+    {
+        if ($this->projectTasks->removeElement($projectTask)) {
+            $projectTask->removeProject($this);
+        }
 
         return $this;
     }
