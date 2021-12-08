@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'app:harvest:import:projects', description: 'Import projects from Harvest')]
-class Projects extends Command
+class Projects extends AbstractCommandWithHttpRequestProgressBar
 {
 
     private ProjectFetcher $fetcher;
@@ -24,7 +24,8 @@ class Projects extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $this->fetcher->load();
+        $this->setupHttpRequestProgressBar($io);
+        $this->fetcher->fetchAndLoadAsync();
         $io->success('Done');
 
         return Command::SUCCESS;

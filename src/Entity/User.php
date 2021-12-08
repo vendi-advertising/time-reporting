@@ -6,6 +6,7 @@ use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
 use App\DTO\HarvestTokens;
 use App\Repository\UserRepository;
+use App\Service\Fetchers\UserFetcher;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiEntity]
+#[ApiEntity(fetcher: UserFetcher::class)]
 class User implements UserInterface
 {
     use ExternalEntityIdTrait;
@@ -64,7 +65,10 @@ class User implements UserInterface
     private ?DateTimeInterface $harvestAccessTokenExpiration = null;
 
     #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'users')]
-    private $projects;
+    private Collection $projects;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class)]
+    private Collection $timeEntries;
 
     public function __construct(int $id, string $firstName, string $lastName, string $email)
     {
@@ -73,6 +77,7 @@ class User implements UserInterface
         $this->lastName = $lastName;
         $this->email = $email;
         $this->projects = new ArrayCollection();
+        $this->timeEntries = new ArrayCollection();
     }
 
     public function getFirstName(): string
@@ -279,5 +284,35 @@ class User implements UserInterface
         $this->setHarvestAccessToken($tokens->accessToken);
         $this->setHarvestRefreshToken($tokens->refreshToken);
         $this->setHarvestAccessTokenExpiration($tokens->getExpirationDateTime());
+    }
+
+    /**
+     * @return Collection|TimeEntry[]
+     */
+    public function getTimeEntries(): Collection
+    {
+        return $this->timeEntries;
+    }
+
+    public function addTimeEntry(TimeEntry $timeEntry): self
+    {
+        if (!$this->timeEntries->contains($timeEntry)) {
+            $this->timeEntries[] = $timeEntry;
+            $timeEntry->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTimeEntry(TimeEntry $timeEntry): self
+    {
+        if ($this->timeEntries->removeElement($timeEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($timeEntry->getUser() === $this) {
+                $timeEntry->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

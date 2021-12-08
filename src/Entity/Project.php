@@ -5,12 +5,13 @@ namespace App\Entity;
 use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
 use App\Repository\ProjectRepository;
+use App\Service\Fetchers\ProjectFetcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ApiEntity([Client::class])]
+#[ApiEntity([Client::class], fetcher: ProjectFetcher::class)]
 class Project
 {
     use ExternalEntityIdTrait;
@@ -51,8 +52,11 @@ class Project
     #[ORM\ManyToOne(targetEntity: ProjectCategory::class, inversedBy: 'projects')]
     private ProjectCategory $projectCategory;
 
-    #[ORM\ManyToMany(targetEntity: ProjectTask::class, mappedBy: 'project')]
-    private $projectTasks;
+    #[ORM\ManyToMany(targetEntity: Task::class, inversedBy: 'projects')]
+    private $tasks;
+
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: TimeEntry::class)]
+    private $timeEntries;
 
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)
     {
@@ -63,7 +67,8 @@ class Project
         $this->isActive = $isActive;
         $this->client = $client;
         $this->users = new ArrayCollection();
-        $this->projectTasks = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+        $this->timeEntries = new ArrayCollection();
     }
 
 
@@ -194,28 +199,77 @@ class Project
         return $this;
     }
 
-    /**
-     * @return Collection|ProjectTask[]
-     */
-    public function getProjectTasks(): Collection
+    public function getTaskById(int $id): ?Task
     {
-        return $this->projectTasks;
+        foreach ($this->getTasks() as $task) {
+            if ($task->getId() === $id) {
+                return $task;
+            }
+        }
+
+        return null;
     }
 
-    public function addProjectTask(ProjectTask $projectTask): self
+    public function hasTaskById(int $id): bool
     {
-        if (!$this->projectTasks->contains($projectTask)) {
-            $this->projectTasks[] = $projectTask;
-            $projectTask->addProject($this);
+        foreach ($this->getTasks() as $task) {
+            if ($task->getId() === $id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Collection|Task[]
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): self
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks[] = $task;
         }
 
         return $this;
     }
 
-    public function removeProjectTask(ProjectTask $projectTask): self
+    public function removeTask(Task $task): self
     {
-        if ($this->projectTasks->removeElement($projectTask)) {
-            $projectTask->removeProject($this);
+        $this->tasks->removeElement($task);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|TimeEntry[]
+     */
+    public function getTimeEntries(): Collection
+    {
+        return $this->timeEntries;
+    }
+
+    public function addTimeEntry(TimeEntry $timeEntry): self
+    {
+        if (!$this->timeEntries->contains($timeEntry)) {
+            $this->timeEntries[] = $timeEntry;
+            $timeEntry->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTimeEntry(TimeEntry $timeEntry): self
+    {
+        if ($this->timeEntries->removeElement($timeEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($timeEntry->getProject() === $this) {
+                $timeEntry->setProject(null);
+            }
         }
 
         return $this;

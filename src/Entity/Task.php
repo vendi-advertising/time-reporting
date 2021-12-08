@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
 use App\Repository\TaskRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
@@ -28,7 +30,15 @@ class Task
 
     #[ORM\Column(type: 'boolean')]
     #[ApiProperty('is_default')]
-    private bool $isDefault;
+    private bool $isDefault = false;
+
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'tasks')]
+    private $projects;
+
+    public function __construct()
+    {
+        $this->projects = new ArrayCollection();
+    }
 
     public function getName(): ?string
     {
@@ -74,6 +84,33 @@ class Task
     public function setIsDefault(bool $isDefault): self
     {
         $this->isDefault = $isDefault;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Project[]
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): self
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects[] = $project;
+            $project->addTask($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): self
+    {
+        if ($this->projects->removeElement($project)) {
+            $project->removeTask($this);
+        }
 
         return $this;
     }

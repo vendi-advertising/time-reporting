@@ -5,12 +5,13 @@ namespace App\Entity;
 use App\Attributes\ApiEntity;
 use App\Attributes\ApiProperty;
 use App\Repository\ClientRepository;
+use App\Service\Fetchers\ClientFetcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
-#[ApiEntity]
+#[ApiEntity(fetcher: ClientFetcher::class)]
 class Client
 {
     use ExternalEntityIdTrait;
@@ -23,12 +24,16 @@ class Client
     #[ORM\OneToMany(mappedBy: "client", targetEntity: Project::class)]
     private Collection $projects;
 
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: TimeEntry::class)]
+    private Collection $timeEntries;
+
     public function __construct(int $id, string $name, bool $isActive)
     {
         $this->id = $id;
         $this->name = $name;
         $this->isActive = $isActive;
         $this->projects = new ArrayCollection();
+        $this->timeEntries = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -67,6 +72,36 @@ class Client
             // set the owning side to null (unless already changed)
             if ($project->getClient() === $this) {
                 $project->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|TimeEntry[]
+     */
+    public function getTimeEntries(): Collection
+    {
+        return $this->timeEntries;
+    }
+
+    public function addTimeEntry(TimeEntry $timeEntry): self
+    {
+        if (!$this->timeEntries->contains($timeEntry)) {
+            $this->timeEntries[] = $timeEntry;
+            $timeEntry->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTimeEntry(TimeEntry $timeEntry): self
+    {
+        if ($this->timeEntries->removeElement($timeEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($timeEntry->getClient() === $this) {
+                $timeEntry->setClient(null);
             }
         }
 

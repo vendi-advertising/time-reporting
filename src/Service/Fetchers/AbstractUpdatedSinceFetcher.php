@@ -10,26 +10,26 @@ use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-abstract class AbstractUpdatedSinceFetcher extends AbstractFetcher implements UpdatedSinceInterface
+abstract class AbstractUpdatedSinceFetcher extends AbstractFetcher
 {
     private SyncLogRepository $syncLogRepository;
     private EntityManagerInterface $entityManager;
 
-    public function setLastSync(DateTimeInterface $dateTimeRun = null): void
+    final public function setLastSync(DateTimeInterface $dateTimeRun = null): void
     {
         $entry = new SyncLog($this->getSyncEntityIdentifier(), $dateTimeRun ?? new DateTimeImmutable(timezone: new DateTimeZone('UTC')));
         $this->entityManager->persist($entry);
         $this->entityManager->flush();
     }
 
-    public function getLastSync(): ?DateTimeInterface
+    final public function getLastSync(): ?DateTimeInterface
     {
         $ret = $this->syncLogRepository->findOneBy(['entity' => $this->getSyncEntityIdentifier()], ['dateTimeRun' => 'DESC']);
 
         return $ret?->getDateTimeRun();
     }
 
-    public function getSyncEntityIdentifier(): string
+    final public function getSyncEntityIdentifier(): string
     {
         return static::class;
     }

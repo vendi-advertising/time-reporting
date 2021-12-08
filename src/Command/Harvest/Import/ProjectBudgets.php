@@ -24,7 +24,7 @@ class ProjectBudgets extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $this->fetcher->load();
+        $this->fetcher->fetchAndLoadAsync();
         $io->success('Done');
 
         return Command::SUCCESS;

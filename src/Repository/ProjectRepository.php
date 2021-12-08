@@ -19,6 +19,16 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
+
+    public function findAllProjectsWithTasks()
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.tasks', 't')
+            ->addSelect('t')
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Project[] Returns an array of Project objects
     //  */

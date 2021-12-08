@@ -6,6 +6,7 @@ use App\Exception\TimeReportingException;
 use App\Service\ApiEntityMaker;
 use App\Service\HarvestApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractFetcher implements FetcherInterface
 {
@@ -13,53 +14,64 @@ abstract class AbstractFetcher implements FetcherInterface
     private ApiEntityMaker $entityMaker;
     private HarvestApiFetcher $fetcher;
 
-    public function __construct(HarvestApiFetcher $fetcher, EntityManagerInterface $manager, ApiEntityMaker $entityMaker)
-    {
-        $this->manager = $manager;
-        $this->entityMaker = $entityMaker;
-        $this->fetcher = $fetcher;
-    }
-
-    public function getEntityMaker(): ApiEntityMaker
+    protected function getEntityMaker(): ApiEntityMaker
     {
         return $this->entityMaker;
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
-    public function getManager(): EntityManagerInterface
+    protected function getManager(): EntityManagerInterface
     {
         return $this->manager;
     }
 
-    /**
-     * @return HarvestApiFetcher
-     */
-    public function getFetcher(): HarvestApiFetcher
+    protected function getFetcher(): HarvestApiFetcher
     {
         return $this->fetcher;
     }
 
-    protected function getThings(string $url, string $key, callable $transformer, array $options = [], int $perPage = 100): array
+    #[Required]
+    public function setManager(EntityManagerInterface $manager): void
     {
-        $responses = $this->fetcher->getPagedResponses($url, $perPage, $options);
+        $this->manager = $manager;
+    }
+
+    #[Required]
+    public function setEntityMaker(ApiEntityMaker $entityMaker): void
+    {
+        $this->entityMaker = $entityMaker;
+    }
+
+    #[Required]
+    public function setFetcher(HarvestApiFetcher $fetcher): void
+    {
+        $this->fetcher = $fetcher;
+    }
+
+    protected function getThingsAsync(string $url, string $key, callable $singleItemTransformerFunction, callable $persistenceFunction, array $options = [], int $perPage = 100): void
+    {
+        $this->fetcher->getPagedResponsesAsync(
+            $url,
+            $perPage,
+            fn($responseArray, $page) => $persistenceFunction($this->transformPagedResponse($responseArray, $key, $singleItemTransformerFunction)),
+            $options
+        );
+    }
+
+    private function transformPagedResponse(array $response, string $key, callable $transformer): array
+    {
         $things = [];
-        foreach ($responses as $response) {
-            foreach ($response[$key] as $thing) {
-                $things[] = $transformer($thing);
-            }
+        foreach ($response[$key] as $thing) {
+            $things[] = $transformer($thing);
         }
 
         return $things;
     }
 
-    protected function loadThings(callable $remoteGetter, callable $localGetter): void
+    protected function persistRemoteThings(array $remoteThings, callable $localGetter): void
     {
-        $allRemoteThings = $remoteGetter();
         $allLocalThings = $localGetter();
 
-        foreach ($allRemoteThings as $remoteThing) {
+        foreach ($remoteThings as $remoteThing) {
 
             $localToBeUpdated = null;
             foreach ($allLocalThings as $localThing) {
@@ -78,10 +90,6 @@ abstract class AbstractFetcher implements FetcherInterface
         }
 
         $this->manager->flush();
-
-        if ($this instanceof AbstractUpdatedSinceFetcher) {
-            $this->setLastSync();
-        }
     }
 
     protected function areRemoteAndLocalSame(object $remoteThing, object $localThing): bool

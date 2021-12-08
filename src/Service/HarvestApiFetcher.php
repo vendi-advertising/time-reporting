@@ -2,18 +2,23 @@
 
 namespace App\Service;
 
+use App\Events\HttpRequestItemCountDeterminedEvent;
+use App\Events\HttpRequestItemCountUpdatedEvent;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class HarvestApiFetcher
 {
     private HttpClientInterface $harvestClient;
     private LoggerInterface $logger;
+    private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(HttpClientInterface $harvestClient, LoggerInterface $logger)
+    public function __construct(HttpClientInterface $harvestClient, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher)
     {
         $this->harvestClient = $harvestClient;
         $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
 //    public function getUserAssignmentsByUserId(int $userId): array
@@ -38,37 +43,82 @@ final class HarvestApiFetcher
 //        return $things;
 //    }
 
-    public function getPagedResponses(string $url, int $perPage, array $options = []): array
+    public function getSingleResponseArray(string $url, int $perPage, array $options = [], int $page = 1): array
     {
-        $this->logger->debug('Call to getPagedResponses', ['url' => $url, 'per-page' => $perPage, 'option' => $options]);
+        $defaultOptions = [
+            'query' => [
+                'page' => $page,
+                'per_page' => $perPage,
+            ],
+        ];
+
+        $finalOptions = array_merge_recursive($options, $defaultOptions);
+
+        $response = $this->harvestClient->request(
+            'GET',
+            $url,
+            $finalOptions
+        );
+
+        return $response->toArray();
+    }
+
+    public function getPagedResponsesAsync(string $url, int $perPage, callable $untransformedGroupedResponseFunction, array $options): void
+    {
+        $this->logger->debug('Call to getPagedResponsesAndApplyCallback', ['url' => $url, 'per-page' => $perPage, 'options' => $options]);
         $page = 1;
 
         $hasMorePages = true;
-        $responses = [];
+        $itemCountDetermined = false;
+        $itemCount = 0;
         while ($hasMorePages) {
-            $defaultOptions = [
-                'query' => [
-                    'page' => $page,
-                    'per_page' => $perPage,
-                ],
-            ];
 
-            $finalOptions = array_merge_recursive($options, $defaultOptions);
+            $this->logger->debug('Fetching remote', ['url' => $url, 'per-page' => $perPage, 'page' => $page]);
 
-            $response = $this->harvestClient->request(
-                'GET',
-                $url,
-                $finalOptions
-            );
+            $responseArray = $this->getSingleResponseArray($url, $perPage, $options, $page);
 
-            $responseArray = $response->toArray();
-            $responses[$page] = $responseArray;
+            $untransformedGroupedResponseFunction($responseArray, $page);
+
+            $itemCount += count($responseArray);
             $nextPage = $responseArray['next_page'] ?? $page;
             $hasMorePages = $nextPage > $page;
             $page = $nextPage;
+
+            if (!$itemCountDetermined && $responseArray['total_entries']) {
+                $this->eventDispatcher->dispatch(new HttpRequestItemCountDeterminedEvent($responseArray['total_entries'], $url, $options));
+                $itemCountDetermined = true;
+            }
+
+            $this->eventDispatcher->dispatch(new HttpRequestItemCountUpdatedEvent($itemCount, $url, $options));
         }
+    }
+
+    /**
+     * @deprecated Prefer the async version
+     */
+    public function getPagedResponsesSync(string $url, int $perPage, array $options): array
+    {
+        $responses = [];
+        $this
+            ->getPagedResponsesAsync(
+                $url,
+                $perPage,
+                static function ($responseArray, $page) use (&$responses) {
+                    $responses[$page] = $responseArray;
+                },
+                $options
+            );
 
         return $responses;
+    }
+
+
+    /**
+     * @deprecated Prefer the async version
+     */
+    public function getPagedResponses(string $url, int $perPage, array $options): array
+    {
+        return $this->getPagedResponsesSync($url, $perPage, $options);
     }
 
     /**

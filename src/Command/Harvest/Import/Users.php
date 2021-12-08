@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'app:harvest:import:users', description: 'Import users from Harvest')]
-class Users extends Command
+class Users extends AbstractCommandWithHttpRequestProgressBar
 {
     private UserFetcher $fetcher;
 
@@ -23,7 +23,8 @@ class Users extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $this->fetcher->load();
+        $this->setupHttpRequestProgressBar($io);
+        $this->fetcher->fetchAndLoadAsync();
         $io->success('Done');
 
         return Command::SUCCESS;
