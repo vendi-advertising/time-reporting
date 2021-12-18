@@ -27,7 +27,7 @@ final class UserFetcher extends AbstractSimpleFetcher
         $responseArray = $response->toArray();
 
         $userFromHarvest = $this->transform($responseArray);
-        $userFromDatabase = $this->userRepository->find($userFromHarvest->getId());
+        $userFromDatabase = $this->getObjectRepository()->find($userFromHarvest->getId());
 
         // TODO: How can this happen?
         if (!$userFromDatabase) {

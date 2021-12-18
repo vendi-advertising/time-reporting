@@ -35,6 +35,11 @@ class RememberMe extends AbstractRememberMeHandler
         if (!$user instanceof User) {
             throw new TimeReportingException('The remembered user was not a User entity');
         }
+
+        if (!$user->getHarvestRefreshToken()) {
+            return;
+        }
+
         $tokens = $this->harvestOauth->refreshTokens($user);
         $user->setHarvestAccessToken($tokens);
         $this->manager->persist($user);

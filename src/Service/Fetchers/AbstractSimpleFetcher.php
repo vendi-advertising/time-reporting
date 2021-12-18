@@ -44,4 +44,9 @@ abstract class AbstractSimpleFetcher extends AbstractUpdatedSinceFetcher
 
         $this->setLastSync();
     }
+
+    protected function getObjectRepository(): ObjectRepository
+    {
+        return $this->objectRepository;
+    }
 }
