@@ -26,10 +26,18 @@ is used for global synchronization of objects.
 
 ### Symfony setup
 
+#### Generate a new secret
+
+1. Run `symfony console app:generate-secret`
+2. Note the `APP_SECRET`
+
+#### Update environment variables
+
 1. Copy `.env` to `.env.local`
 2. Set the environment variables that start with `HARVEST_` accordingly
 3. Update the `DATABASE_URL` variable accordingly
-4. Run `symfony console doctrine:migrations:migrate`
+4. Update `APP_SECRET`
+5. Run `symfony console doctrine:migrations:migrate`
 
 ### Application setup
 
