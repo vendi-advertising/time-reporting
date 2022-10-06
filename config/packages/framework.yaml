@@ -25,10 +25,16 @@ framework:
                     Harvest-Account-ID: '%env(HARVEST_ACCOUNT_ID)%'
                     Authorization: 'Bearer %env(HARVEST_API_TOKEN)%'
                     User-Agent: '%app.harvest.useragent%'
+
+                #TODO: Handle certs correctly
+                verify_peer: false
             harvest.user.oauth:
                 base_uri: 'https://id.getharvest.com'
                 headers:
                     User-Agent: '%app.harvest.useragent%'
+
+                #TODO: Handle certs correctly
+                verify_peer: false
 
 when@test:
     framework:

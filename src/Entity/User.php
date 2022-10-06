@@ -20,45 +20,45 @@ class User implements UserInterface
     use ExternalEntityIdTrait;
     use IsActiveTrait;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column]
     #[ApiProperty('first_name')]
     private string $firstName;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column]
     #[ApiProperty('last_name')]
     private string $lastName;
 
-    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[ORM\Column(unique: true)]
     #[ApiProperty]
     private string $email;
 
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column]
     #[ApiProperty('is_admin')]
     private bool $isAdmin;
 
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column]
     #[ApiProperty('is_project_manager')]
     private bool $isProjectManager;
 
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column]
     #[ApiProperty('is_contractor')]
     private bool $isContractor;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column]
     #[ApiProperty('weekly_capacity')]
     private int $weeklyCapacity;
 
-    #[ORM\Column(type: "string", length: 1024, nullable: true)]
+    #[ORM\Column(length: 1024, nullable: true)]
     #[ApiProperty('avatar_url')]
     private ?string $avatarUrl = null;
 
     #[ORM\Column(type: "simple_array", nullable: true)]
     private array $roles = [];
 
-    #[ORM\Column(type: 'string', length: 1024, nullable: true)]
+    #[ORM\Column(length: 1024, nullable: true)]
     private ?string $harvestAccessToken = null;
 
-    #[ORM\Column(type: 'string', length: 1024, nullable: true)]
+    #[ORM\Column(length: 1024, nullable: true)]
     private ?string $harvestRefreshToken = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -70,6 +70,9 @@ class User implements UserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class)]
     private Collection $timeEntries;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Favorite::class)]
+    private Collection $favorites;
+
     public function __construct(int $id, string $firstName, string $lastName, string $email)
     {
         $this->id = $id;
@@ -78,6 +81,7 @@ class User implements UserInterface
         $this->email = $email;
         $this->projects = new ArrayCollection();
         $this->timeEntries = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
     }
 
     public function getFirstName(): string
@@ -310,6 +314,36 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($timeEntry->getUser() === $this) {
                 $timeEntry->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Favorite>
+     */
+    public function getFavorites(): Collection
+    {
+        return $this->favorites;
+    }
+
+    public function addFavorite(Favorite $favorite): self
+    {
+        if (!$this->favorites->contains($favorite)) {
+            $this->favorites->add($favorite);
+            $favorite->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavorite(Favorite $favorite): self
+    {
+        if ($this->favorites->removeElement($favorite)) {
+            // set the owning side to null (unless already changed)
+            if ($favorite->getUser() === $this) {
+                $favorite->setUser(null);
             }
         }
 

@@ -1,0 +1,29 @@
+details ::marker {
+    content: "";
+}
+
+details .favorite-icon {
+    color: #000;
+    opacity: 0.3;
+    background: none;
+    border: none;
+    font-size: 1em;
+    padding: 0;
+    cursor: pointer;
+}
+
+details summary {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 1.6rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    border: 1px solid black;
+    border-bottom: none;
+}
+
+details summary + * {
+    border: 1px solid black;
+    border-top: none;
+    border-bottom: none;
+    margin: 0;
+}

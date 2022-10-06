@@ -3,12 +3,24 @@
 {% block title %}Time{% endblock %}
 
 {% block main %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/time.css') }}">
+    <script src="{{ asset('js/favorites.js') }}" defer></script>
     {% for client in clients %}
         <details>
-            <summary>{{ client.name }}</summary>
+            <summary data-object-id="{{ client.id }}" data-object-type="client" data-object-name="{{ client.name }}">
+                <button class="favorite-icon" data-role="favorite"
+                        data-aria-label-add="Add {{ client.name }} to favorites"
+                        data-aria-label-remove="Remove {{ client.name }} from favorites"
+                >★
+                </button>
+                {{ client.name }}
+            </summary>
             <ul>
                 {% for project in client.projects %}
-                    <li>{{ project.name }}</li>
+                    <li data-object-id="{{ project.id }}" data-object-type="project" data-object-name="{{ project.name }}">{{ project.name }}</li>
                 {% endfor %}
             </ul>
         </details>
