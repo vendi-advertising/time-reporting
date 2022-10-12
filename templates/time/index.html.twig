@@ -7,7 +7,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/time.css') }}">
+    <script>
+        window.apiEndpointTimeEntry = '{{ apiEndpointTimeEntry }}';
+    </script>
     <script src="{{ asset('js/favorites.js') }}" defer></script>
+    <script src="{{ asset('js/time.js') }}" defer></script>
+    <div class="time-header">
+        <span></span>
+        <span></span>
+        <span></span>
+        {% for weekday in dates %}
+            <span>{{ weekday.name }}<br/>{{ weekday.displayDate }}</span>
+        {% endfor %}
+    </div>
     {% for client in clients %}
         <details>
             <summary data-object-id="{{ client.id }}" data-object-type="client" data-object-name="{{ client.name }}">
@@ -17,10 +29,24 @@
                 >★
                 </button>
                 {{ client.name }}
+                <button class="accordion-toggle">
+                    <span>+</span>
+                </button>
             </summary>
             <ul>
                 {% for project in client.projects %}
-                    <li data-object-id="{{ project.id }}" data-object-type="project" data-object-name="{{ project.name }}">{{ project.name }}</li>
+                    <li data-object-id="{{ project.id }}" data-object-type="project" data-object-name="{{ project.name }}">
+                        <button class="favorite-icon" data-role="favorite"
+                                data-aria-label-add="Add {{ client.name }} to favorites"
+                                data-aria-label-remove="Remove {{ client.name }} from favorites"
+                        >★
+                        </button>
+                        <span>{{ project.name }}</span>
+                        {% for weekday in dates %}
+                            <input type="number" data-role="time-entry-field" name="{{ project.id }}|{{ weekday.idDate }}"
+                                   placeholder="0" step="0.25" min="0" max="100"/>
+                        {% endfor %}
+                    </li>
                 {% endfor %}
             </ul>
         </details>

@@ -1,3 +1,23 @@
+:root {
+    --time-left-column-width: 2rem;
+    --time-right-column-width: 2rem;
+    --time-input-column-width: 8rem;
+}
+
+.time-header {
+    font-family: 'Inter Tight', sans-serif;
+    display: grid;
+    grid-template-columns: 2rem auto auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
+    gap: 1rem;
+    text-align: center;
+    font-size: 1.4rem;
+    padding: 0.5rem;
+}
+
+details {
+    font-family: 'Inter Tight', sans-serif;
+}
+
 details ::marker {
     content: "";
 }
@@ -13,12 +33,20 @@ details .favorite-icon {
 }
 
 details summary {
-    font-family: 'Inter Tight', sans-serif;
     font-size: 1.6rem;
     padding: 0.5rem;
     cursor: pointer;
     border: 1px solid black;
     border-bottom: none;
+    display: grid;
+    grid-template-columns: var(--time-left-column-width) auto var(--time-right-column-width);
+    gap: 1rem;
+    align-items: center;
+    user-select: none;
+}
+
+details:nth-child(even) summary {
+    background-color: rgba(0, 0, 0, 0.10);
 }
 
 details summary + * {
@@ -26,4 +54,54 @@ details summary + * {
     border-top: none;
     border-bottom: none;
     margin: 0;
+}
+
+details .accordion-toggle {
+    border: none;
+    background: none;
+    pointer-events: none;
+    cursor: pointer;
+}
+
+details :where(ul,li) {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+details li {
+    padding-block: 1rem;
+    display: grid;
+    grid-template-columns: var(--time-left-column-width) max-content auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
+    gap: 1rem;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    align-items: center;
+}
+
+details li:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+details li button {
+    grid-column: 2;
+}
+
+details li span {
+    user-select: none;
+}
+
+details li:first-child {
+    border-top-color: black;
+}
+
+details li:last-child {
+    border-bottom: none;
+}
+
+details li input[type=number] {
+    max-width: 4em;
+    padding: 0.5rem;
+    margin-inline: auto;
 }
