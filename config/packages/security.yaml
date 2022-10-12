@@ -17,7 +17,8 @@ security:
             lazy: true
             provider: users_in_memory
             custom_authenticator: App\Security\HarvestAuthenticator
-            logout: true
+            logout:
+                path: app_logout
             remember_me:
                 secret: '%kernel.secret%'
                 always_remember_me: true

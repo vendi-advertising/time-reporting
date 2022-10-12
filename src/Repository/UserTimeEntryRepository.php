@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserTimeEntry;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +21,26 @@ class UserTimeEntryRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserTimeEntry::class);
+    }
+
+    /**
+     * @param User $user
+     * @param DateTimeInterface $start
+     * @param DateTimeInterface $end
+     * @return UserTimeEntry[]
+     */
+    public function findAllByUserAndDateRange(User $user, DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        $qb = $this->createQueryBuilder('e');
+
+        return $qb
+            ->andWhere('e.user = :user')
+            ->andWhere($qb->expr()->between('e.entryDateInt', ':start', ':end'))
+            ->setParameter('user', $user)
+            ->setParameter('start', (int)$start->format('Ymd'))
+            ->setParameter('end', (int)$end->format('Ymd'))
+            ->getQuery()
+            ->getResult();
     }
 
     public function save(UserTimeEntry $entity, bool $flush = false): void

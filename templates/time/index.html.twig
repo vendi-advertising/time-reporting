@@ -41,10 +41,18 @@
                                 data-aria-label-remove="Remove {{ client.name }} from favorites"
                         >★
                         </button>
-                        <span>{{ project.name }}</span>
+                        <span>
+                            {{ project.name }}
+                        </span>
                         {% for weekday in dates %}
-                            <input type="number" data-role="time-entry-field" name="{{ project.id }}|{{ weekday.idDate }}"
-                                   placeholder="0" step="0.25" min="0" max="100"/>
+                            <input
+                                    {% if userTimeEntries[project.id][weekday.idDate] is defined %}
+                                        value="{{ userTimeEntries[project.id][weekday.idDate] }}"
+                                    {% endif %}
+                                    type="number"
+                                    data-role="time-entry-field"
+                                    name="{{ project.id }}|{{ weekday.idDate }}"
+                                    placeholder="0" step="0.25" min="0" max="100"/>
                         {% endfor %}
                     </li>
                 {% endfor %}

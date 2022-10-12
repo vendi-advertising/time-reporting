@@ -14,6 +14,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SecurityController extends AbstractController
 {
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(Request $request): Response
+    {
+        // NOOP
+    }
+
     #[Route('/auth', name: 'app_auth')]
     public function auth(Request $request): Response
     {

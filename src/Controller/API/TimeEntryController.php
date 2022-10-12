@@ -46,7 +46,7 @@ class TimeEntryController extends AbstractController
             return $this->createErrorResponse('Weird unknown user type thing');
         }
 
-        $timeEntry = $userTimeEntryRepository->findOneBy(['user' => $user, 'project' => $project, 'entryDate' => $entryDate]);
+        $timeEntry = $userTimeEntryRepository->findOneBy(['user' => $user, 'project' => $project, 'entryDateInt' => $entryDate->format('Ymd')]);
         if ($timeEntry && (int)$fieldValue === 0) {
             $userTimeEntryRepository->remove($timeEntry, true);
         } else{
