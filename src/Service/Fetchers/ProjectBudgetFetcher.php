@@ -7,11 +7,8 @@ use App\Repository\ProjectRepository;
 
 final class ProjectBudgetFetcher extends AbstractFetcher
 {
-    private ProjectRepository $projectRepository;
-
-    public function __construct(ProjectRepository $projectRepository)
+    public function __construct(private readonly ProjectRepository $projectRepository)
     {
-        $this->projectRepository = $projectRepository;
     }
 
     public function transform(array $payload): ProjectBudget

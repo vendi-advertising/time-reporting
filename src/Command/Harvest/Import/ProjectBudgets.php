@@ -13,12 +13,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ProjectBudgets extends Command
 {
 
-    private ProjectBudgetFetcher $fetcher;
-
-    public function __construct(ProjectBudgetFetcher $fetcher)
+    public function __construct(private readonly ProjectBudgetFetcher $fetcher)
     {
         parent::__construct();
-        $this->fetcher = $fetcher;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

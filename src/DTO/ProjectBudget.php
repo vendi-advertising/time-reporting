@@ -24,11 +24,11 @@ class ProjectBudget
     public bool $isActive;
 
     #[ApiProperty('budget')]
-    public ?float $budgetTotal;
+    public ?float $budgetTotal = null;
 
     #[ApiProperty('budget_spent')]
-    public ?float $budgetSpent;
+    public ?float $budgetSpent = null;
 
     #[ApiProperty('budget_remaining')]
-    public ?float $budgetRemaining;
+    public ?float $budgetRemaining = null;
 }

@@ -42,7 +42,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $code = $request->get('code');
-        $scopes = explode(' ', $request->get('scope'));
+        $scopes = explode(' ', (string) $request->get('scope'));
 
         return new Passport(
             new UserBadge(
@@ -93,9 +93,7 @@ class HarvestAuthenticator extends AbstractAuthenticator
                 }
             ),
             new CustomCredentials(
-                static function ($credentials, User $user) {
-                    return true;
-                },
+                static fn($credentials, User $user) => true,
                 ''
             ),
             [

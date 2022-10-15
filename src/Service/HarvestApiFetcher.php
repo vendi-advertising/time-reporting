@@ -67,9 +67,6 @@ final class HarvestApiFetcher
         }
     }
 
-    /**
-     * @return HttpClientInterface
-     */
     public function getHarvestClient(): HttpClientInterface
     {
         return $this->harvestClient;

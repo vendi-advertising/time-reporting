@@ -37,7 +37,7 @@ class TimeEntryController extends AbstractController
 
         try {
             $entryDate = new DateTimeImmutable($dateString);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $this->createErrorResponse('Could not parse date');
         }
 

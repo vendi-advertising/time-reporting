@@ -9,16 +9,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HarvestOauth
 {
-    private HttpClientInterface $httpClient;
-
-    public function __construct(HttpClientInterface $harvestUserOauth, private readonly string $harvestOAuthClientId, private readonly string $harvestOAuthClientSecret)
+    public function __construct(private readonly HttpClientInterface $harvestUserOauth, private readonly string $harvestOAuthClientId, private readonly string $harvestOAuthClientSecret)
     {
-        $this->httpClient = $harvestUserOauth;
     }
 
     public function getUserId(HarvestTokens $harvestTokens): ?int
     {
-        $response = $this->httpClient->request(
+        $response = $this->harvestUserOauth->request(
             'GET',
             '/api/v2/accounts',
             [
@@ -38,7 +35,7 @@ class HarvestOauth
 
     public function refreshTokens(User $user): HarvestTokens
     {
-        $response = $this->httpClient->request(
+        $response = $this->harvestUserOauth->request(
             'POST',
             '/api/v2/oauth2/token',
             [
@@ -59,7 +56,7 @@ class HarvestOauth
 
     public function getTokens(string $authorizationCode): HarvestTokens
     {
-        $response = $this->httpClient->request(
+        $response = $this->harvestUserOauth->request(
             'POST',
             '/api/v2/oauth2/token',
             [
