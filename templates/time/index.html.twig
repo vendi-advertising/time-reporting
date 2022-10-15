@@ -28,7 +28,15 @@
                         data-aria-label-remove="Remove {{ client.name }} from favorites"
                 >★
                 </button>
-                {{ client.name }}
+                <span>
+                    {{ client.name }}
+                </span>
+                {% for weekday in dates %}
+                    <span
+                            class="time-entry-header"
+                            data-date="{{ weekday.idDate }}"
+                    ></span>
+                {% endfor %}
                 <button class="accordion-toggle">
                     <span>+</span>
                 </button>
@@ -37,8 +45,8 @@
                 {% for project in client.projects %}
                     <li data-object-id="{{ project.id }}" data-object-type="project" data-object-name="{{ project.name }}">
                         <button class="favorite-icon" data-role="favorite"
-                                data-aria-label-add="Add {{ client.name }} to favorites"
-                                data-aria-label-remove="Remove {{ client.name }} from favorites"
+                                data-aria-label-add="Add {{ project.name }} to favorites"
+                                data-aria-label-remove="Remove {{ project.name }} from favorites"
                         >★
                         </button>
                         <span>
@@ -49,6 +57,7 @@
                                     {% if userTimeEntries[project.id][weekday.idDate] is defined %}
                                         value="{{ userTimeEntries[project.id][weekday.idDate] }}"
                                     {% endif %}
+                                    data-date="{{ weekday.idDate }}"
                                     type="number"
                                     data-role="time-entry-field"
                                     name="{{ project.id }}|{{ weekday.idDate }}"

@@ -39,10 +39,14 @@ details summary {
     border: 1px solid black;
     border-bottom: none;
     display: grid;
-    grid-template-columns: var(--time-left-column-width) auto var(--time-right-column-width);
+    grid-template-columns: var(--time-left-column-width) auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
     gap: 1rem;
     align-items: center;
     user-select: none;
+}
+
+details summary .time-entry-header {
+    text-align: center;
 }
 
 details:nth-child(even) summary {

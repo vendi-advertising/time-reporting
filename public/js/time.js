@@ -6,6 +6,39 @@
         // Variable aliasing
         document = window.document,
 
+        setupHeaders = () => {
+            document
+                .querySelectorAll('details')
+                .forEach(
+                    (detail) => {
+
+                        detail
+                            .querySelectorAll('summary .time-entry-header')
+                            .forEach(
+                                (header) => {
+
+                                    let value = 0;
+
+                                    detail
+                                        .querySelectorAll(`input[data-date="${header.getAttribute('data-date')}"]`)
+                                        .forEach(
+                                            (thing) => {
+                                                if (thing.value) {
+                                                    value += parseFloat(thing.value);
+                                                }
+                                            }
+                                        )
+                                    ;
+
+                                    header.innerHTML = value;
+                                }
+                            )
+                        ;
+                    }
+                )
+            ;
+        },
+
         bindAllInputs = () => {
             document
                 .querySelectorAll('[data-role~=time-entry-field]')
@@ -40,6 +73,7 @@
 
         run = () => {
             bindAllInputs();
+            setupHeaders();
         }
     ;
 
