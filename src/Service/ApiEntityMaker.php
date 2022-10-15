@@ -14,11 +14,8 @@ use Symfony\Component\VarExporter\Instantiator;
 
 class ApiEntityMaker
 {
-    private ObjectManager $objectManager;
-
-    public function __construct(ObjectManager $objectManager)
+    public function __construct(private readonly ObjectManager $objectManager)
     {
-        $this->objectManager = $objectManager;
     }
 
     /**
@@ -46,7 +43,7 @@ class ApiEntityMaker
         $localReflector = $this->getReflectionClass($localEntity);
         foreach ($privateProperties as $propertyName => $propertyValue) {
             $localProperty = $localReflector->getProperty($propertyName);
-            $localProperty->setAccessible(true);
+            //$localProperty->setAccessible(true);
             $localProperty->setValue($localEntity, $propertyValue);
         }
     }
@@ -98,7 +95,7 @@ class ApiEntityMaker
         if ($value instanceof DateTimeInterface) {
             return $value;
         }
-        
+
         $ret = \DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value);
         if (false === $ret) {
             throw new EntityMakerException(sprintf('Could not transform %1$s to a datetime', $value));

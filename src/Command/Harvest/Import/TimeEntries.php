@@ -12,12 +12,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:harvest:import:time-entries', description: 'Import time entries from Harvest')]
 class TimeEntries extends AbstractCommandWithHttpRequestProgressBar
 {
-    private TimeEntryFetcher $fetcher;
-
-    public function __construct(TimeEntryFetcher $fetcher)
+    public function __construct(private readonly TimeEntryFetcher $fetcher)
     {
         parent::__construct();
-        $this->fetcher = $fetcher;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

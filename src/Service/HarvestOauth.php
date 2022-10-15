@@ -9,16 +9,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HarvestOauth
 {
-
     private HttpClientInterface $httpClient;
-    private string $harvestOAuthClientId;
-    private string $harvestOAuthClientSecret;
 
-    public function __construct(HttpClientInterface $harvestUserOauth, string $harvestOAuthClientId, string $harvestOAuthClientSecret)
+    public function __construct(HttpClientInterface $harvestUserOauth, private readonly string $harvestOAuthClientId, private readonly string $harvestOAuthClientSecret)
     {
         $this->httpClient = $harvestUserOauth;
-        $this->harvestOAuthClientId = $harvestOAuthClientId;
-        $this->harvestOAuthClientSecret = $harvestOAuthClientSecret;
     }
 
     public function getUserId(HarvestTokens $harvestTokens): ?int

@@ -24,23 +24,14 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class HarvestAuthenticator extends AbstractAuthenticator
 {
-    private HarvestOauth $harvestOauth;
-    private HarvestApiFetcher $fetcher;
-    private EntityManagerInterface $manager;
-    private RouterInterface $router;
-    private int $harvestAccountId;
-    private LoggerInterface $logger;
-    private UserFetcher $userFetcher;
-
-    public function __construct(HarvestOauth $harvestOauth, HarvestApiFetcher $fetcher, EntityManagerInterface $manager, RouterInterface $router, int $harvestAccountId, LoggerInterface $logger, UserFetcher $userFetcher)
-    {
-        $this->harvestOauth = $harvestOauth;
-        $this->fetcher = $fetcher;
-        $this->manager = $manager;
-        $this->router = $router;
-        $this->harvestAccountId = $harvestAccountId;
-        $this->logger = $logger;
-        $this->userFetcher = $userFetcher;
+    public function __construct(
+        private readonly HarvestOauth $harvestOauth,
+        private readonly EntityManagerInterface $manager,
+        private readonly RouterInterface $router,
+        private readonly int $harvestAccountId,
+        private readonly LoggerInterface $logger,
+        private readonly UserFetcher $userFetcher
+    ) {
     }
 
     public function supports(Request $request): ?bool

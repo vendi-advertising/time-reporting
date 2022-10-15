@@ -10,15 +10,8 @@ use Stringable;
 
 class HarvestTokens implements Stringable
 {
-    public string $accessToken;
-    public string $refreshToken;
-    public int $expiresIn;
-
-    public function __construct(string $accessToken, string $refreshToken, int $expiresIn)
+    public function __construct(public string $accessToken, public string $refreshToken, public int $expiresIn)
     {
-        $this->accessToken = $accessToken;
-        $this->refreshToken = $refreshToken;
-        $this->expiresIn = $expiresIn;
     }
 
     public static function fromApiResponse(array $response): self
@@ -38,9 +31,7 @@ class HarvestTokens implements Stringable
 
     public function getExpirationDateTime(): DateTimeInterface
     {
-        $now = new DateTimeImmutable();
-
-        return $now->add(new DateInterval('PT'.$this->expiresIn.'S'));
+        return (new DateTimeImmutable())->add(new DateInterval('PT'.$this->expiresIn.'S'));
     }
 
     public function __toString()
