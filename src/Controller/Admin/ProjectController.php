@@ -53,6 +53,8 @@ class ProjectController extends AbstractController
 
 //            $clientId =
         }
+
+        //TODO: return something
     }
 
     #[Route('/project-category', name: 'project_categories_list', methods: ['GET'])]

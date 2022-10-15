@@ -10,6 +10,7 @@ use DateTimeInterface;
 use Doctrine\Persistence\ObjectManager;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
 use Symfony\Component\VarExporter\Instantiator;
 
 class ApiEntityMaker
@@ -196,7 +197,7 @@ class ApiEntityMaker
             $arrayKeyName = $apiProperty->getApiArrayKeyName() ?? $property->getName();
 
             $nameAndType = new ApiPropertyNameAndType($arrayKeyName, $apiProperty->getApiPropertyType());
-            if (ApiProperty::PROPERTY_TYPE_ENTITY === $apiProperty->getApiPropertyType()) {
+            if ((ApiProperty::PROPERTY_TYPE_ENTITY === $apiProperty->getApiPropertyType()) && ($property->getType() instanceof ReflectionNamedType)) {
                 $nameAndType->setEntityClass($property->getType()->getName());
             }
 

@@ -71,7 +71,6 @@ class Project
         $this->timeEntries = new ArrayCollection();
     }
 
-
     public function getName(): ?string
     {
         return $this->name;
