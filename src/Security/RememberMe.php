@@ -15,8 +15,14 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 
 class RememberMe extends AbstractRememberMeHandler
 {
-public function __construct(private readonly HarvestOauth $harvestOauth, private readonly EntityManagerInterface $manager, UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], LoggerInterface $logger = null)
-    {
+    public function __construct(
+        private readonly HarvestOauth $harvestOauth,
+        private readonly EntityManagerInterface $manager,
+        UserProviderInterface $userProvider,
+        RequestStack $requestStack,
+        array $options = [],
+        LoggerInterface $logger = null
+    ) {
         parent::__construct($userProvider, $requestStack, $options, $logger);
     }
 
@@ -45,6 +51,6 @@ public function __construct(private readonly HarvestOauth $harvestOauth, private
 
     private function generateHash(string $tokenValue): string
     {
-        return hash_hmac('sha256', $tokenValue, (string) $this->secret);
+        return hash_hmac('sha256', $tokenValue, (string)$this->secret);
     }
 }
