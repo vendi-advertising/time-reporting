@@ -14,13 +14,8 @@ class ApiProperty
     public const PROPERTY_TYPE_ENTITY = 'entity';
     public const PROPERTY_TYPE_BOOLEAN = 'boolean';
 
-    private ?string $apiArrayKeyName;
-    private string $apiPropertyType;
-
-    public function __construct(string $apiArrayKeyName = null, string $apiPropertyType = self::PROPERTY_TYPE_DEFAULT)
+    public function __construct(private ?string $apiArrayKeyName = null, private string $apiPropertyType = self::PROPERTY_TYPE_DEFAULT)
     {
-        $this->apiArrayKeyName = $apiArrayKeyName;
-        $this->apiPropertyType = $apiPropertyType;
     }
 
     public function getApiArrayKeyName(): ?string

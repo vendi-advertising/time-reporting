@@ -10,13 +10,8 @@ use Exception;
 final class ProjectFetcher extends AbstractUpdatedSinceFetcher
 {
 
-    private ProjectRepository $projectRepository;
-    private ClientRepository $clientRepository;
-
-    public function __construct(ClientRepository $clientRepository, ProjectRepository $projectRepository)
+    public function __construct(private ClientRepository $clientRepository, private ProjectRepository $projectRepository)
     {
-        $this->projectRepository = $projectRepository;
-        $this->clientRepository = $clientRepository;
     }
 
     public function transform(array $payload): Project

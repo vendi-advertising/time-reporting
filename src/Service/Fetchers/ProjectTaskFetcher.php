@@ -10,11 +10,8 @@ use App\Repository\ProjectRepository;
 class ProjectTaskFetcher extends AbstractUpdatedSinceFetcher
 {
 
-    private ProjectRepository $projectRepository;
-
-    public function __construct(ProjectRepository $projectRepository)
+    public function __construct(private ProjectRepository $projectRepository)
     {
-        $this->projectRepository = $projectRepository;
     }
 
     public function transform(array $payload): mixed

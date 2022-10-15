@@ -12,12 +12,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:harvest:import:tasks', description: 'Import tasks from Harvest')]
 class Tasks extends Command
 {
-    private TaskFetcher $fetcher;
-
-    public function __construct(TaskFetcher $fetcher)
+    public function __construct(private TaskFetcher $fetcher)
     {
         parent::__construct();
-        $this->fetcher = $fetcher;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -6,21 +6,8 @@ use Doctrine\Persistence\ObjectRepository;
 
 abstract class AbstractSimpleFetcher extends AbstractUpdatedSinceFetcher
 {
-    private string $url;
-    private string $key;
-    private ObjectRepository $objectRepository;
-    private string $className;
-    private array $options;
-    private int $perPage;
-
-    public function __construct(string $url, string $key, ObjectRepository $objectRepository, string $className, array $options = [], int $perPage = 100)
+    public function __construct(private string $url, private string $key, private ObjectRepository $objectRepository, private string $className, private array $options = [], private int $perPage = 100)
     {
-        $this->url = $url;
-        $this->key = $key;
-        $this->objectRepository = $objectRepository;
-        $this->className = $className;
-        $this->options = $options;
-        $this->perPage = $perPage;
     }
 
     final public function transform(array $payload): mixed

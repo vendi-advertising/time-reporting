@@ -12,12 +12,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:harvest:import:users', description: 'Import users from Harvest')]
 class Users extends AbstractCommandWithHttpRequestProgressBar
 {
-    private UserFetcher $fetcher;
-
-    public function __construct(UserFetcher $fetcher)
+    public function __construct(private UserFetcher $fetcher)
     {
         parent::__construct();
-        $this->fetcher = $fetcher;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

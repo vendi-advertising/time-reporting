@@ -15,19 +15,9 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 
 class RememberMe extends AbstractRememberMeHandler
 {
-//    public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
-//    {
-//        dd('dfsdf');
-//    }
-
-    private HarvestOauth $harvestOauth;
-    private EntityManagerInterface $manager;
-
-    public function __construct(HarvestOauth $harvestOauth, EntityManagerInterface $manager, UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], LoggerInterface $logger = null)
+public function __construct(private HarvestOauth $harvestOauth, private EntityManagerInterface $manager, UserProviderInterface $userProvider, RequestStack $requestStack, array $options = [], LoggerInterface $logger = null)
     {
         parent::__construct($userProvider, $requestStack, $options, $logger);
-        $this->harvestOauth = $harvestOauth;
-        $this->manager = $manager;
     }
 
     protected function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
