@@ -6,7 +6,7 @@ use Doctrine\Persistence\ObjectRepository;
 
 abstract class AbstractSimpleFetcher extends AbstractUpdatedSinceFetcher
 {
-    public function __construct(private string $url, private string $key, private ObjectRepository $objectRepository, private string $className, private array $options = [], private int $perPage = 100)
+    public function __construct(private readonly string $url, private readonly string $key, private readonly ObjectRepository $objectRepository, private readonly string $className, private readonly array $options = [], private readonly int $perPage = 100)
     {
     }
 

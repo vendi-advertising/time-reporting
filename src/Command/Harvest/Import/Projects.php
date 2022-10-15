@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class Projects extends AbstractCommandWithHttpRequestProgressBar
 {
 
-    public function __construct(private ProjectFetcher $fetcher)
+    public function __construct(private readonly ProjectFetcher $fetcher)
     {
         parent::__construct();
     }

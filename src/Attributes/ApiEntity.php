@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 class ApiEntity
 {
-    public function __construct(private array $dependsOn = [], private ?string $fetcher = null)
+    public function __construct(private readonly array $dependsOn = [], private readonly ?string $fetcher = null)
     {
     }
 

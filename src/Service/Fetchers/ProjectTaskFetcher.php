@@ -10,7 +10,7 @@ use App\Repository\ProjectRepository;
 class ProjectTaskFetcher extends AbstractUpdatedSinceFetcher
 {
 
-    public function __construct(private ProjectRepository $projectRepository)
+    public function __construct(private readonly ProjectRepository $projectRepository)
     {
     }
 

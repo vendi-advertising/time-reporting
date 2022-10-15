@@ -7,7 +7,7 @@ use App\Repository\ProjectRepository;
 
 final class ProjectBudgetFetcher extends AbstractFetcher
 {
-    public function __construct(private ProjectRepository $projectRepository)
+    public function __construct(private readonly ProjectRepository $projectRepository)
     {
     }
 

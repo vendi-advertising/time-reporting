@@ -4,7 +4,7 @@ namespace App\DTO;
 
 class ApiPropertyNameAndType
 {
-    public ?string $entityClass;
+    public ?string $entityClass = null;
 
     public function __construct(public mixed $name, public string $type)
     {

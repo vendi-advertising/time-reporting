@@ -10,7 +10,7 @@ use Exception;
 final class ProjectFetcher extends AbstractUpdatedSinceFetcher
 {
 
-    public function __construct(private ClientRepository $clientRepository, private ProjectRepository $projectRepository)
+    public function __construct(private readonly ClientRepository $clientRepository, private readonly ProjectRepository $projectRepository)
     {
     }
 

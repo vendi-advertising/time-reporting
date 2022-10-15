@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ProjectTasks extends AbstractCommandWithHttpRequestProgressBar
 {
 
-    public function __construct(private ProjectTaskFetcher $fetcher)
+    public function __construct(private readonly ProjectTaskFetcher $fetcher)
     {
         throw new TimeReportingException('Importing of project tasks is a feature that might be dropped because it isn\'t needed');
         parent::__construct();

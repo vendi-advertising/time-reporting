@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ProjectBudgets extends Command
 {
 
-    public function __construct(private ProjectBudgetFetcher $fetcher)
+    public function __construct(private readonly ProjectBudgetFetcher $fetcher)
     {
         parent::__construct();
     }
