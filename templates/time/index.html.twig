@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/time.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/time-header.css') }}">
     <script>
         window.apiEndpointTimeEntry = '{{ apiEndpointTimeEntry }}';
     </script>
@@ -15,10 +16,11 @@
     <div class="time-header">
         <span></span>
         <span></span>
-        <span></span>
+        <a href="{{ path('time', {'dateStart' : previousWeek}) }}" class="arrow older">&laquo;</a>
         {% for weekday in dates %}
             <span>{{ weekday.name }}<br/>{{ weekday.displayDate }}</span>
         {% endfor %}
+        <a href="{{ path('time', {'dateStart' : nextWeek}) }}" class="arrow newer">&raquo;</a>
     </div>
     {% for client in clients %}
         <details>

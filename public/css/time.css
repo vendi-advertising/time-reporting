@@ -4,16 +4,6 @@
     --time-input-column-width: 8rem;
 }
 
-.time-header {
-    font-family: 'Inter Tight', sans-serif;
-    display: grid;
-    grid-template-columns: 2rem auto auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
-    gap: 1rem;
-    text-align: center;
-    font-size: 1.4rem;
-    padding: 0.5rem;
-}
-
 details {
     font-family: 'Inter Tight', sans-serif;
 }
