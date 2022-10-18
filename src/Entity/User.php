@@ -70,9 +70,6 @@ class User implements UserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class)]
     private Collection $timeEntries;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Favorite::class)]
-    private Collection $favorites;
-
     public function __construct(int $id, string $firstName, string $lastName, string $email)
     {
         $this->id = $id;
@@ -81,7 +78,6 @@ class User implements UserInterface
         $this->email = $email;
         $this->projects = new ArrayCollection();
         $this->timeEntries = new ArrayCollection();
-        $this->favorites = new ArrayCollection();
     }
 
     public function getFirstName(): string
@@ -314,36 +310,6 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($timeEntry->getUser() === $this) {
                 $timeEntry->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Favorite>
-     */
-    public function getFavorites(): Collection
-    {
-        return $this->favorites;
-    }
-
-    public function addFavorite(Favorite $favorite): self
-    {
-        if (!$this->favorites->contains($favorite)) {
-            $this->favorites->add($favorite);
-            $favorite->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFavorite(Favorite $favorite): self
-    {
-        if ($this->favorites->removeElement($favorite)) {
-            // set the owning side to null (unless already changed)
-            if ($favorite->getUser() === $this) {
-                $favorite->setUser(null);
             }
         }
 
