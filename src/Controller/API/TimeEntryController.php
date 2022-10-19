@@ -4,9 +4,11 @@ namespace App\Controller\API;
 
 use App\Entity\User;
 use App\Entity\UserTimeEntry;
+use App\Repository\ClientRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserTimeEntryRepository;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +19,53 @@ use Symfony\Component\Security\Core\Security;
 #[Route('/api', name: 'api_time_')]
 class TimeEntryController extends AbstractController
 {
+    #[Route('/favorite', name: 'favorite', methods: 'POST')]
+    public function addFavorite(Request $request, Security $security, ProjectRepository $projectRepository, ClientRepository $clientRepository, EntityManagerInterface $entityManager): Response
+    {
+        $objectId = $request->request->get('object-id');
+        $objectType = $request->request->get('object-type');
+        $action = $request->request->get('action');
+
+        if (!in_array($objectType, ['project', 'client'], true)) {
+            return $this->createErrorResponse('Unknown object type');
+        }
+
+        if (!in_array($action, ['add', 'remove'], true)) {
+            return $this->createErrorResponse('Unknown action');
+        }
+
+        $object = match ($objectType) {
+            'project' => $projectRepository->find($objectId),
+            'client' => $clientRepository->find($objectId),
+        };
+
+        if (!$object) {
+            return $this->createErrorResponse('Could not find selected '.$objectType);
+        }
+
+        $user = $security->getUser();
+        if (!$user instanceof User) {
+            return $this->createErrorResponse('Weird unknown user type thing');
+        }
+
+        $function = match ($objectType) {
+            'project' => match ($action) {
+                'add' => $user->addFavoriteProject(...),
+                'remove' => $user->removeFavoriteProject(...)
+            },
+            'client' => match ($action) {
+                'add' => $user->addFavoriteClient(...),
+                'remove' => $user->removeFavoriteClient(...)
+            }
+        };
+
+        $function($objectId);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
 
     #[Route('/add', name: 'add', methods: 'POST')]
     public function add(Request $request, Security $security, ProjectRepository $projectRepository, UserTimeEntryRepository $userTimeEntryRepository): Response
@@ -49,8 +98,8 @@ class TimeEntryController extends AbstractController
         $timeEntry = $userTimeEntryRepository->findOneBy(['user' => $user, 'project' => $project, 'entryDateInt' => $entryDate->format('Ymd')]);
         if ($timeEntry && (int)$fieldValue === 0) {
             $userTimeEntryRepository->remove($timeEntry, true);
-        } else{
-            if(!$timeEntry) {
+        } else {
+            if (!$timeEntry) {
                 $timeEntry = new UserTimeEntry($user, $project, $entryDate);
             }
             $timeEntry->setHours((float)$fieldValue);

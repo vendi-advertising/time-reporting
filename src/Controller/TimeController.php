@@ -44,6 +44,7 @@ class TimeController extends AbstractController
                 'clients' => $clientRepository->findAllActiveClientsAndProjects(),
                 'controller_name' => 'TimeController',
                 'apiEndpointTimeEntry' => $this->generateUrl('api_time_add'),
+                'apiEndpointFavorites' => $this->generateUrl('api_time_favorite'),
                 'dates' => [
                     new DayOfWeek('Monday', $monday->format('m/d'), $monday->format('Y-m-d')),
                     new DayOfWeek('Tuesday', $monday->modify('+1 day')->format('m/d'), $monday->modify('+1 day')->format('Y-m-d')),
@@ -54,6 +55,8 @@ class TimeController extends AbstractController
                 'userTimeEntries' => $userTimeEntriesArray,
                 'previousWeek' => $previousWeek->format('Ymd'),
                 'nextWeek' => $nextWeek->format('Ymd'),
+                'favoriteProjects' => $user->getFavoriteProjects(),
+                'favoriteClients' => $user->getFavoriteClients(),
             ]
         );
     }

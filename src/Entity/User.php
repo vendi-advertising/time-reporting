@@ -10,6 +10,7 @@ use App\Service\Fetchers\UserFetcher;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -69,6 +70,12 @@ class User implements UserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class)]
     private Collection $timeEntries;
+
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    private array $favoriteProjects = [];
+
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    private array $favoriteClients = [];
 
     public function __construct(int $id, string $firstName, string $lastName, string $email)
     {
@@ -187,6 +194,10 @@ class User implements UserInterface
         return array_unique($roles);
     }
 
+    /**
+     * @param string[] $roles
+     * @return $this
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -194,12 +205,12 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return null;
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }
@@ -209,7 +220,7 @@ class User implements UserInterface
         // TODO: Implement eraseCredentials() method.
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->email;
     }
@@ -294,25 +305,73 @@ class User implements UserInterface
         return $this->timeEntries;
     }
 
-    public function addTimeEntry(TimeEntry $timeEntry): self
+    /**
+     * @return int[]
+     */
+    public function getFavoriteProjects(): array
     {
-        if (!$this->timeEntries->contains($timeEntry)) {
-            $this->timeEntries[] = $timeEntry;
-            $timeEntry->setUser($this);
-        }
-
-        return $this;
+        return $this->favoriteProjects;
     }
 
-    public function removeTimeEntry(TimeEntry $timeEntry): self
+    /**
+     * @return int[]
+     */
+    public function getFavoriteClients(): array
     {
-        if ($this->timeEntries->removeElement($timeEntry)) {
-            // set the owning side to null (unless already changed)
-            if ($timeEntry->getUser() === $this) {
-                $timeEntry->setUser(null);
+        return $this->favoriteClients;
+    }
+
+    public function removeFavoriteProject(int $id): void
+    {
+        $this->favoriteProjects = $this->intArray($this->favoriteProjects);
+        foreach ($this->favoriteProjects as $idx => $favoriteId) {
+            if ($id === $favoriteId) {
+                unset($this->favoriteProjects[$idx]);
             }
         }
+    }
 
-        return $this;
+    public function removeFavoriteClient(int $id): void
+    {
+        $this->favoriteClients = $this->intArray($this->favoriteClients);
+        foreach ($this->favoriteClients as $idx => $favoriteId) {
+            if ($id === $favoriteId) {
+                unset($this->favoriteClients[$idx]);
+            }
+        }
+    }
+
+    /**
+     * @param string[]|int[] $array
+     * @return int[]
+     */
+    private function intArray(array $array): array
+    {
+        $ret = [];
+        foreach ($array as $value) {
+            if (!$value) {
+                continue;
+            }
+
+            $ret[] = (int)$value;
+        }
+
+        return array_unique($ret);
+    }
+
+    public function addFavoriteProject(int $id): void
+    {
+        $this->favoriteProjects = $this->intArray($this->favoriteProjects);
+        if (!in_array($id, $this->favoriteProjects, true)) {
+            $this->favoriteProjects[] = $id;
+        }
+    }
+
+    public function addFavoriteClient(int $id): void
+    {
+        $this->favoriteClients = $this->intArray($this->favoriteClients);
+        if (!in_array($id, $this->favoriteClients, true)) {
+            $this->favoriteClients[] = $id;
+        }
     }
 }

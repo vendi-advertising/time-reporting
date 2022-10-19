@@ -22,6 +22,14 @@ details .favorite-icon {
     cursor: pointer;
 }
 
+details summary[data-is-favorite~=true] > .favorite-icon {
+    color: #aaaa00;
+}
+
+details li[data-is-favorite~=true] > .favorite-icon {
+    color: #aaaa00;
+}
+
 details summary {
     font-size: 1.6rem;
     padding: 0.5rem;

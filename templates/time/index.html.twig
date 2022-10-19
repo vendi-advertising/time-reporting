@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/time-header.css') }}">
     <script>
         window.apiEndpointTimeEntry = '{{ apiEndpointTimeEntry }}';
+        window.apiEndpointFavorites = '{{ apiEndpointFavorites }}';
     </script>
     <script src="{{ asset('js/favorites.js') }}" defer></script>
     <script src="{{ asset('js/time.js') }}" defer></script>
@@ -24,7 +25,12 @@
     </div>
     {% for client in clients %}
         <details>
-            <summary data-object-id="{{ client.id }}" data-object-type="client" data-object-name="{{ client.name }}">
+            <summary
+                    data-object-id="{{ client.id }}"
+                    data-object-type="client"
+                    data-object-name="{{ client.name }}"
+                    data-is-favorite="{{ client.id in favoriteClients ? 'true' : 'false' }}"
+            >
                 <button class="favorite-icon" data-role="favorite"
                         data-aria-label-add="Add {{ client.name }} to favorites"
                         data-aria-label-remove="Remove {{ client.name }} from favorites"
@@ -45,7 +51,12 @@
             </summary>
             <ul>
                 {% for project in client.projects %}
-                    <li data-object-id="{{ project.id }}" data-object-type="project" data-object-name="{{ project.name }}">
+                    <li
+                            data-object-id="{{ project.id }}"
+                            data-object-type="project"
+                            data-object-name="{{ project.name }}"
+                            data-is-favorite="{{ project.id in favoriteProjects ? 'true' : 'false' }}"
+                    >
                         <button class="favorite-icon" data-role="favorite"
                                 data-aria-label-add="Add {{ project.name }} to favorites"
                                 data-aria-label-remove="Remove {{ project.name }} from favorites"
