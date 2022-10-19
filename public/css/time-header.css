@@ -1,5 +1,4 @@
 .time-header {
-    font-family: 'Inter Tight', sans-serif;
     display: grid;
     grid-template-columns: 2rem auto auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
     gap: 1rem;

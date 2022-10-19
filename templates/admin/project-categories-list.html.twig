@@ -1,6 +1,6 @@
-{% extends 'base.html.twig' %}
+{% extends 'logged-in-base.html.twig' %}
 
-{% block body %}
+{% block main %}
     {% include('includes/flash-messages.html.twig') %}
     <ul>
         {% for pc in project_categories %}

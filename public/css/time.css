@@ -4,10 +4,6 @@
     --time-input-column-width: 8rem;
 }
 
-details {
-    font-family: 'Inter Tight', sans-serif;
-}
-
 details ::marker {
     content: "";
 }
@@ -22,12 +18,10 @@ details .favorite-icon {
     cursor: pointer;
 }
 
-details summary[data-is-favorite~=true] > .favorite-icon {
-    color: #aaaa00;
-}
-
+details summary[data-is-favorite~=true] > .favorite-icon,
 details li[data-is-favorite~=true] > .favorite-icon {
-    color: #aaaa00;
+    color: #efdd00;
+    opacity: 1;
 }
 
 details summary {
@@ -104,6 +98,7 @@ details li:last-child {
 
 details li input[type=number] {
     max-width: 4em;
-    padding: 0.5rem;
+    padding: 0.3rem;
     margin-inline: auto;
+    font-size: 1rem;
 }

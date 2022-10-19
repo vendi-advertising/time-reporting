@@ -1,19 +1,27 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
+{% endblock %}
+
 {% block body %}
-    {% block nav %}
-        <ul>
-            <li><a href="#">Time Reporting</a></li>
-            <li><a href="#">Week Managements</a></li>
-            <li>
-                <strong>Admin</strong>
-                <ul>
-                    <li><a href="{{ path('admin_project_categories_list') }}">Project Category List</a></li>
-                    <li><a href="{{ path('admin_project_category_grid') }}">Project Grid</a></li>
-                </ul>
-            </li>
-        </ul>
-    {% endblock %}
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ path('time') }}">Time Reporting</a></li>
+                {% if app.user.isAdmin %}
+                    <li>
+                        <strong>Admin</strong>
+                        <ul>
+                            <li><a href="{{ path('admin_project_categories_list') }}">Project Categories</a></li>
+                            <li><a href="{{ path('admin_project_category_grid') }}">Project Grid</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
     {% block main %}
     {% endblock %}
 {% endblock %}

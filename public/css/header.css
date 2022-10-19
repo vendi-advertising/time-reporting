@@ -1,0 +1,30 @@
+header {
+    padding: 2rem;
+    background-color: #b41e1e;
+    display: grid;
+    grid-template-columns: 10rem auto;
+}
+
+header :where(*, a) {
+    color: #fff;
+}
+
+header .title {
+}
+
+header nav :where( ul, li) {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: max-content;
+}
+
+header nav > ul {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 2rem;
+}
+
+header nav > ul ul {
+    display: none;
+}

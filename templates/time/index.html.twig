@@ -2,18 +2,23 @@
 
 {% block title %}Time{% endblock %}
 
-{% block main %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+{% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/time.css') }}">
     <link rel="stylesheet" href="{{ asset('css/time-header.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
     <script>
         window.apiEndpointTimeEntry = '{{ apiEndpointTimeEntry }}';
         window.apiEndpointFavorites = '{{ apiEndpointFavorites }}';
     </script>
     <script src="{{ asset('js/favorites.js') }}" defer></script>
     <script src="{{ asset('js/time.js') }}" defer></script>
+{% endblock %}
+
+{% block main %}
     <div class="time-header">
         <span></span>
         <span></span>
