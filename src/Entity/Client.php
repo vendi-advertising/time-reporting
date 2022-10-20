@@ -27,6 +27,8 @@ class Client
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: TimeEntry::class)]
     private Collection $timeEntries;
 
+    private array $projectForReporting = [];
+
     public function __construct(int $id, string $name, bool $isActive)
     {
         $this->id = $id;

@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\DTO\DayOfWeek;
+use App\DTO\Rollup\RollupClient;
 use App\Entity\User;
+use App\Entity\UserTimeEntry;
 use App\Repository\ClientRepository;
 use App\Repository\UserTimeEntryRepository;
 use DateTimeImmutable;
@@ -14,6 +16,42 @@ use Symfony\Component\Security\Core\Security;
 
 class TimeController extends AbstractController
 {
+    #[Route('/app/report/{dateStart}', name: 'report')]
+    public function report(UserTimeEntryRepository $userTimeEntryRepository, ?int $dateStart = null)
+    {
+        if (!$dateStart) {
+            $dateStartObj = new DateTimeImmutable;
+        } else {
+            $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
+        }
+
+        $entryDate = new \DateTimeImmutable('2022-10-17');
+
+        /** @var UserTimeEntry[] $entries */
+        $entries = $userTimeEntryRepository->rollupReport((int)$entryDate->format('Ymd'));
+        $clients = [];
+        foreach ($entries as $entry) {
+            $clientId = $entry->getProject()->getClient()->getId();
+
+            if (!isset($clients[$clientId])) {
+                $clients[$clientId] = RollupClient::fromEntity($entry->getProject()->getClient())
+            }
+
+            $rollupClient = $clients[$clientId];
+
+            $client->addProjectForReport($entry->getProject());
+        }
+
+        asort($clients);
+
+        return $this->render(
+            'report/index.html.twig',
+            [
+                'clients' => $clients,
+            ]
+        );
+    }
+
     #[Route('/app/time/{dateStart}', name: 'time')]
     public function index(ClientRepository $clientRepository, UserTimeEntryRepository $userTimeEntryRepository, Security $security, ?int $dateStart = null): Response
     {

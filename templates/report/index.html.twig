@@ -1,0 +1,28 @@
+{% extends 'logged-in-base.html.twig' %}
+
+{% block title %}Time{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block main %}
+    <ul>
+        {% for client in clients %}
+            <li>
+                {{ client.name }}
+                <ul>
+                    {% for project in client.projectsForReport %}
+                        <li>
+                            {{ project.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

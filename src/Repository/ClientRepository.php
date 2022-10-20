@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Client;
+use App\Entity\Project;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,6 +19,17 @@ class ClientRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Client::class);
+    }
+
+    public function rollupReport(int $entryDateInt): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $qb
+            ->leftJoin(Project::class, 'p')
+            ->leftJoin(User::class, 'u')
+            ->andWhere('ute.entryDateInt = :entryDateInt')
+            ->setParameter('entryDateInt', $entryDateInt);
     }
 
     public function findAllActiveClientsAndProjects()
