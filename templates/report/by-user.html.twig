@@ -34,8 +34,8 @@
                             {{ client.name }} ({{ client.time }})
                         </summary>
                         <div class="indent-me">
-                            {% for project in client.projects %}
-                                <ul>
+                            <ul>
+                                {% for project in client.projects %}
                                     {% if project.time %}
                                         <li>
                                             {{ project.code }}
@@ -44,8 +44,8 @@
                                             {{ project.time }}
                                         </li>
                                     {% endif %}
-                                </ul>
-                            {% endfor %}
+                                {% endfor %}
+                            </ul>
                         </div>
                     </details>
                 {% endfor %}
