@@ -21,7 +21,7 @@ class Client
     #[ApiProperty]
     private string $name;
 
-    #[ORM\OneToMany(mappedBy: "client", targetEntity: Project::class)]
+    #[ORM\OneToMany(mappedBy: "client", targetEntity: Project::class, fetch: 'EAGER')]
     private Collection $projects;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: TimeEntry::class)]

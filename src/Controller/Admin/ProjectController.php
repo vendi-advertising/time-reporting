@@ -6,6 +6,7 @@ use App\Entity\ProjectCategory;
 use App\Exception\TimeReportingException;
 use App\Repository\ClientRepository;
 use App\Repository\ProjectCategoryRepository;
+use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +34,7 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/project-category/grid', name: 'project_category_grid_save', methods: ['POST'])]
-    public function projectCategoryGridSave(ProjectCategoryRepository $projectCategoryRepository, ClientRepository $clientRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function projectCategoryGridSave(ProjectCategoryRepository $projectCategoryRepository, ProjectRepository $projectRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $submittedToken = $request->request->get('token');
         if (!$this->isCsrfTokenValid(self::TOKEN_FOR_PROJECT_GRID, $submittedToken)) {
@@ -42,19 +43,33 @@ class ProjectController extends AbstractController
 
         $all = $request->request->all();
         foreach ($all as $key => $value) {
-            if (!str_starts_with($key, 'client::')) {
+            if (!str_starts_with($key, 'project:')) {
                 continue;
             }
 
-            $clientParts = explode(':', $key);
-            if (2 !== count($clientParts)) {
-                throw new TimeReportingException('Two parts not found in client radio');
+            $projectParts = explode(':', $key);
+            if (2 !== count($projectParts)) {
+                throw new TimeReportingException('Two parts not found in project radio');
             }
 
-//            $clientId =
+            [, $projectId] = $projectParts;
+
+            $project = $projectRepository->find((int)$projectId);
+            if (!$project) {
+                throw new TimeReportingException('Could not find project');
+            }
+
+            $projectCategory = $projectCategoryRepository->find((int)$value);
+
+            $project->setProjectCategory($projectCategory);
+            $entityManager->persist($project);
         }
 
-        //TODO: return something
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Updated project categories');
+
+        return $this->redirectToRoute('admin_project_category_grid');
     }
 
     #[Route('/project-category', name: 'project_categories_list', methods: ['GET'])]

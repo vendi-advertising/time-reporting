@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\DayOfWeek;
 use App\DTO\Rollup\RollupClient;
+use App\DTO\Rollup\RollupReport;
 use App\Entity\User;
 use App\Entity\UserTimeEntry;
 use App\Repository\ClientRepository;
@@ -17,7 +18,7 @@ use Symfony\Component\Security\Core\Security;
 class TimeController extends AbstractController
 {
     #[Route('/app/report/{dateStart}', name: 'report')]
-    public function report(UserTimeEntryRepository $userTimeEntryRepository, ?int $dateStart = null)
+    public function report(UserTimeEntryRepository $userTimeEntryRepository, ClientRepository $clientRepository, ?int $dateStart = null): Response
     {
         if (!$dateStart) {
             $dateStartObj = new DateTimeImmutable;
@@ -25,29 +26,26 @@ class TimeController extends AbstractController
             $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
         }
 
-        $entryDate = new \DateTimeImmutable('2022-10-17');
-
+//        $entryDate = new \DateTimeImmutable('2022-10-10');
         /** @var UserTimeEntry[] $entries */
-        $entries = $userTimeEntryRepository->rollupReport((int)$entryDate->format('Ymd'));
-        $clients = [];
-        foreach ($entries as $entry) {
-            $clientId = $entry->getProject()->getClient()->getId();
+        $entries = $userTimeEntryRepository->rollupReport((int)$dateStartObj->format('Ymd'));
+        $report = new RollupReport($entries);
 
-            if (!isset($clients[$clientId])) {
-                $clients[$clientId] = RollupClient::fromEntity($entry->getProject()->getClient())
-            }
+        $monday = $dateStartObj->modify('Monday this week');
+        $previousWeek = $monday->modify('-7 days');
+        $nextWeek = $monday->modify('+7 days');
 
-            $rollupClient = $clients[$clientId];
-
-            $client->addProjectForReport($entry->getProject());
-        }
-
-        asort($clients);
+//        dump($report);
 
         return $this->render(
             'report/index.html.twig',
             [
-                'clients' => $clients,
+                'thisWeek' => $monday->format('m/d/Y'),
+                'previousWeek' => $previousWeek->format('Ymd'),
+                'nextWeek' => $nextWeek->format('Ymd'),
+                'report' => $report,
+//                'clients' => $outputClients,
+//                'entries' => $userTimeEntryRepository->findAll(),
             ]
         );
     }

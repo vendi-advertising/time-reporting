@@ -50,7 +50,7 @@ class Project
     public ?float $budgetRemaining;
 
     #[ORM\ManyToOne(targetEntity: ProjectCategory::class, inversedBy: 'projects')]
-    private ProjectCategory $projectCategory;
+    private ?ProjectCategory $projectCategory = null;
 
     #[ORM\ManyToMany(targetEntity: Task::class, inversedBy: 'projects')]
     private $tasks;

@@ -5,7 +5,7 @@ namespace App\DTO\Rollup;
 use App\Entity\Client;
 use App\Entity\Project;
 
-class RollupClient
+class RollupClient extends AbstractHasTimeObject
 {
     /**
      * @var RollupClient[]
@@ -21,15 +21,15 @@ class RollupClient
         return new self($entity->getId(), $entity->getName());
     }
 
-    public function addProjectForReport(Project $project)
+    public function addProjectForReport(Project $project): void
     {
         if (!isset($this->projects[$project->getId()])) {
-            $this->$projects[$project->getId()] = $project;
+            $this->projects[$project->getId()] = $project;
         }
     }
 
-    public function getProjectsForReport(): array
+    public function getTime(): float
     {
-        return $this->$projects;
+        return $this->getTimeFromChildren($this->projects);
     }
 }

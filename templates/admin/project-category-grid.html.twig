@@ -9,7 +9,6 @@
             <thead>
             <tr>
                 <td></td>
-                <th>Billable</th>
                 {% for pc in project_categories %}
                     <th>{{ pc.name }}</th>
                 {% endfor %}
@@ -19,17 +18,21 @@
             {% for client in clients %}
                 <tr>
                     <td><strong>{{ client.name }}</strong></td>
-                    <td><input name="client:{{ client.id }}" value="billable" type="radio"/></td>
                     {% for pc in project_categories %}
-                        <td><input name="client:{{ client.id }}" value="pc:{{ pc.id }}" type="radio"/></td>
+                        <td>
+{#                            <input name="client:{{ client.id }}" value="pc:{{ pc.id }}" type="radio"/>#}
+                        </td>
                     {% endfor %}
                 </tr>
                 {% for project in client.projects %}
                     <tr>
                         <td>{{ project.name }}</td>
-                        <td><input name="client:{{ project.id }}" value="billable" type="radio"/></td>
                         {% for pc in project_categories %}
-                            <td><input name="project:{{ project.id }}" value="pc:{{ pc.id }}" type="radio"/></td>
+                            <td><input name="project:{{ project.id }}" value="{{ pc.id }}" type="radio"
+                                        {% if project.projectCategory and project.projectCategory.id == pc.id %}
+                                            checked
+                                        {% endif %}
+                                /></td>
                         {% endfor %}
                     </tr>
                 {% endfor %}

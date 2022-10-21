@@ -11,14 +11,27 @@
 {% endblock %}
 
 {% block main %}
+    <h1>Report for {{ thisWeek }}</h1>
+    <a href="{{ path('report', {'dateStart':previousWeek}) }}">Previous week</a>
+    <a href="{{ path('report', {'dateStart':nextWeek}) }}">Next week</a>
     <ul>
-        {% for client in clients %}
+        {% for client in report.clients %}
             <li>
-                {{ client.name }}
+                {{ client.name }} ({{ client.time }})
                 <ul>
-                    {% for project in client.projectsForReport %}
+                    {% for project in client.projects %}
                         <li>
-                            {{ project.name }}
+                            {{ project.name }} ({{ project.time }})
+                            <ul>
+                                {% for user in project.users %}
+                                    <li>
+                                        {{ user.user.firstName }}
+                                        {{ user.user.lastName }}
+                                        :
+                                        {{ user.time }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>
