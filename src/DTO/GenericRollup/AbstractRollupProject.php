@@ -8,7 +8,7 @@ abstract class AbstractRollupProject extends AbstractHasTimeObject
 {
     use MakeProjectEntityTrait;
 
-    final public function __construct(public readonly int $id, public readonly string $name)
+    final public function __construct(public readonly int $id, public readonly string $name, public readonly string $code)
     {
     }
 }

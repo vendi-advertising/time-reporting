@@ -4,6 +4,11 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <style>
+        details, .indent-me {
+            margin-inline-start: 2rem;
+        }
+    </style>
 {% endblock %}
 
 {% block javascripts %}
@@ -14,32 +19,33 @@
     <h1>Report for {{ thisWeek }}</h1>
     <a href="{{ path('report_user', {'dateStart':previousWeek}) }}">Previous week</a>
     <a href="{{ path('report_user', {'dateStart':nextWeek}) }}">Next week</a>
-    <ul>
-        {% for user in report.users %}
-            <li>
+    {% for user in report.users %}
+        <details>
+            <summary>
                 {{ user.user.firstName }}
                 {{ user.user.lastName }}
                 :
                 {{ user.time }}
-                <ul>
-                    {% for client in user.clients %}
-                        <li>
+            </summary>
+            <div>
+                {% for client in user.clients %}
+                    <details>
+                        <summary>
                             {{ client.name }} ({{ client.time }})
-                            <ul>
-                                {% for project in client.projects %}
-                                    {% if project.time %}
-                                        <li>
-                                            {{ project.name }}
-                                            :
-                                            {{ project.time }}
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
+                        </summary>
+                        <div class="indent-me">
+                            {% for project in client.projects %}
+                                {% if project.time %}
+                                    {{ project.code }}
+                                    {{ project.name }}
+                                    :
+                                    {{ project.time }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </details>
+                {% endfor %}
+            </div>
+        </details>
+    {% endfor %}
 {% endblock %}
