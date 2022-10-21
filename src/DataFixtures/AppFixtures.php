@@ -44,7 +44,7 @@ class AppFixtures extends Fixture
 
     private function addTimeEntries(ObjectManager $manager): void
     {
-        $users = $manager->getRepository(User::class)->findAll();
+        $users = $manager->getRepository(User::class)->findBy(['isActive' => true]);
         $projects = $manager->getRepository(Project::class)->findAll();
 
         $alwaysProjects = array_rand($projects, 5);

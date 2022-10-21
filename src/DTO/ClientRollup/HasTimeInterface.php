@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Rollup;
+namespace App\DTO\ClientRollup;
 
 interface HasTimeInterface
 {

@@ -1,22 +1,19 @@
 <?php
 
-namespace App\DTO\Rollup;
+namespace App\DTO\ClientRollup;
 
+use App\DTO\GenericRollup\AbstractRollupClient;
 use App\Entity\Client;
 use App\Entity\Project;
 
-class RollupClient extends AbstractHasTimeObject
+class RollupClient extends AbstractRollupClient
 {
     /**
      * @var RollupClient[]
      */
     public array $projects = [];
 
-    public function __construct(public readonly int $id, public readonly string $name)
-    {
-    }
-
-    public static function fromEntity(Client $entity): self
+    public static function fromEntity(Client $entity): static
     {
         return new self($entity->getId(), $entity->getName());
     }

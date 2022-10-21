@@ -10,7 +10,8 @@
         <nav>
             <ul>
                 <li><a href="{{ path('time') }}">Time Reporting</a></li>
-                <li><a href="{{ path('report') }}">Rollup Report</a></li>
+                <li><a href="{{ path('report_client') }}">Rollup Report - By Clients</a></li>
+                <li><a href="{{ path('report_user') }}">Rollup Report - By Users</a></li>
                 {% if app.user.isAdmin %}
                     <li>
                         <strong>Admin</strong>

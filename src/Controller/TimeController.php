@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\DTO\DayOfWeek;
-use App\DTO\Rollup\RollupClient;
-use App\DTO\Rollup\RollupReport;
+use App\DTO\ClientRollup\RollupClient;
+use App\DTO\ClientRollup\RollupReportByClient;
+use App\DTO\UserRollup\RollupReportByUser;
 use App\Entity\User;
 use App\Entity\UserTimeEntry;
 use App\Repository\ClientRepository;
@@ -17,8 +18,8 @@ use Symfony\Component\Security\Core\Security;
 
 class TimeController extends AbstractController
 {
-    #[Route('/app/report/{dateStart}', name: 'report')]
-    public function report(UserTimeEntryRepository $userTimeEntryRepository, ClientRepository $clientRepository, ?int $dateStart = null): Response
+    #[Route('/app/report/user/{dateStart}', name: 'report_user')]
+    public function reportByUser(UserTimeEntryRepository $userTimeEntryRepository, ClientRepository $clientRepository, ?int $dateStart = null): Response
     {
         if (!$dateStart) {
             $dateStartObj = new DateTimeImmutable;
@@ -26,10 +27,9 @@ class TimeController extends AbstractController
             $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
         }
 
-//        $entryDate = new \DateTimeImmutable('2022-10-10');
         /** @var UserTimeEntry[] $entries */
         $entries = $userTimeEntryRepository->rollupReport((int)$dateStartObj->format('Ymd'));
-        $report = new RollupReport($entries);
+        $report = new RollupReportByUser($entries);
 
         $monday = $dateStartObj->modify('Monday this week');
         $previousWeek = $monday->modify('-7 days');
@@ -38,14 +38,40 @@ class TimeController extends AbstractController
 //        dump($report);
 
         return $this->render(
-            'report/index.html.twig',
+            'report/by-user.html.twig',
             [
                 'thisWeek' => $monday->format('m/d/Y'),
                 'previousWeek' => $previousWeek->format('Ymd'),
                 'nextWeek' => $nextWeek->format('Ymd'),
                 'report' => $report,
-//                'clients' => $outputClients,
-//                'entries' => $userTimeEntryRepository->findAll(),
+            ]
+        );
+    }
+
+    #[Route('/app/report/client/{dateStart}', name: 'report_client')]
+    public function reportByClient(UserTimeEntryRepository $userTimeEntryRepository, ClientRepository $clientRepository, ?int $dateStart = null): Response
+    {
+        if (!$dateStart) {
+            $dateStartObj = new DateTimeImmutable;
+        } else {
+            $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
+        }
+
+        /** @var UserTimeEntry[] $entries */
+        $entries = $userTimeEntryRepository->rollupReport((int)$dateStartObj->format('Ymd'));
+        $report = new RollupReportByClient($entries);
+
+        $monday = $dateStartObj->modify('Monday this week');
+        $previousWeek = $monday->modify('-7 days');
+        $nextWeek = $monday->modify('+7 days');
+
+        return $this->render(
+            'report/by-client.html.twig',
+            [
+                'thisWeek' => $monday->format('m/d/Y'),
+                'previousWeek' => $previousWeek->format('Ymd'),
+                'nextWeek' => $nextWeek->format('Ymd'),
+                'report' => $report,
             ]
         );
     }
