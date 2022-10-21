@@ -27,11 +27,13 @@
                             {{ client.name }} ({{ client.time }})
                             <ul>
                                 {% for project in client.projects %}
-                                    <li>
-                                        {{ project.name }}
-                                        :
-                                        {{ project.time }}
-                                    </li>
+                                    {% if project.time %}
+                                        <li>
+                                            {{ project.name }}
+                                            :
+                                            {{ project.time }}
+                                        </li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </li>
