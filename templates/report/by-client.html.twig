@@ -12,8 +12,8 @@
 
 {% block main %}
     <h1>Report for {{ thisWeek }}</h1>
-    <a href="{{ path('report', {'dateStart':previousWeek}) }}">Previous week</a>
-    <a href="{{ path('report', {'dateStart':nextWeek}) }}">Next week</a>
+    <a href="{{ path('report_client', {'dateStart':previousWeek}) }}">Previous week</a>
+    <a href="{{ path('report_client', {'dateStart':nextWeek}) }}">Next week</a>
     <ul>
         {% for client in report.clients %}
             <li>

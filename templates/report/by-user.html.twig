@@ -1,0 +1,55 @@
+{% extends 'logged-in-base.html.twig' %}
+
+{% block title %}Time{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        details, .indent-me {
+            margin-inline-start: 2rem;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block main %}
+    <h1>Report for {{ thisWeek }}</h1>
+    <a href="{{ path('report_user', {'dateStart':previousWeek}) }}">Previous week</a>
+    <a href="{{ path('report_user', {'dateStart':nextWeek}) }}">Next week</a>
+    {% for user in report.users %}
+        <details>
+            <summary>
+                {{ user.user.firstName }}
+                {{ user.user.lastName }}
+                :
+                {{ user.time }}
+            </summary>
+            <div>
+                {% for client in user.clients %}
+                    <details>
+                        <summary>
+                            {{ client.name }} ({{ client.time }})
+                        </summary>
+                        <div class="indent-me">
+                            <ul>
+                                {% for project in client.projects %}
+                                    {% if project.time %}
+                                        <li>
+                                            {{ project.code }}
+                                            {{ project.name }}
+                                            :
+                                            {{ project.time }}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </details>
+                {% endfor %}
+            </div>
+        </details>
+    {% endfor %}
+{% endblock %}

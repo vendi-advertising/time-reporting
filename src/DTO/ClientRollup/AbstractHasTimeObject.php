@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Rollup;
+namespace App\DTO\ClientRollup;
 
 abstract class AbstractHasTimeObject implements HasTimeInterface
 {
@@ -22,7 +22,7 @@ abstract class AbstractHasTimeObject implements HasTimeInterface
         return $this->timeCache;
     }
 
-    final public function hasTime(): bool
+    public function hasTime(): bool
     {
         return $this->getTime() > 0;
     }

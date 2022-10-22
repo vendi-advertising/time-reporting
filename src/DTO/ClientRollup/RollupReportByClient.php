@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DTO\Rollup;
+namespace App\DTO\ClientRollup;
 
 use App\Entity\UserTimeEntry;
 
-class RollupReport
+class RollupReportByClient
 {
     /**
      * @var RollupClient[]
@@ -18,26 +18,26 @@ class RollupReport
     {
         foreach ($userTimeEntries as $userTimeEntry) {
             $clientId = $userTimeEntry->getProject()->getClient()->getId();
+            $projectId = $userTimeEntry->getProject()->getId();
+            $userId = $userTimeEntry->getUser()->getId();
 
+            /** @noinspection DuplicatedCode */
             if (!isset($this->clients[$clientId])) {
                 $this->clients[$clientId] = RollupClient::fromEntity($userTimeEntry->getProject()->getClient());
             }
-
             $rollupClient = $this->clients[$clientId];
 
-            $projectId = $userTimeEntry->getProject()->getId();
+
             if (!isset($rollupClient->projects[$projectId])) {
                 $rollupClient->projects[$projectId] = RollupProject::fromEntity($userTimeEntry->getProject());
             }
-
             $rollupProject = $rollupClient->projects[$projectId];
 
-            $userId = $userTimeEntry->getUser()->getId();
             if (!isset($rollupProject->users[$userId])) {
                 $rollupProject->users[$userId] = RollupUser::fromEntity($userTimeEntry->getUser());
             }
-
             $rollupUser = $rollupProject->users[$userId];
+
             $rollupUser->time += $userTimeEntry->getHours();
         }
     }
