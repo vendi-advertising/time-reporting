@@ -1,0 +1,29 @@
+dialog.confirmation {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: 2rem;
+    padding: unset;
+}
+
+dialog.confirmation :where(.header, .body, .footer) {
+    padding: 2rem;
+}
+
+dialog.confirmation .header {
+    background-color: grey;
+    color: white;
+}
+
+dialog.confirmation .body {
+}
+
+dialog.confirmation .footer {
+    background-color: lightgrey;
+    color: white;
+}
+
+dialog.confirmation .footer form {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 2rem;
+}

@@ -1,5 +1,5 @@
 header {
-    padding: 2rem;
+    padding: 3rem;
     background-color: #b41e1e;
     display: grid;
     grid-template-columns: 10rem auto;
@@ -7,9 +7,6 @@ header {
 
 header :where(*, a) {
     color: #fff;
-}
-
-header .title {
 }
 
 header nav :where( ul, li) {

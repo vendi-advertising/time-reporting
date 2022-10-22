@@ -1,0 +1,44 @@
+.admin-cards {
+}
+
+.admin-cards .card {
+    border: 1px solid black;
+    max-width: 40rem;
+    padding: 2rem;
+}
+
+.admin-cards .button {
+    display: inline-block;
+    color: white;
+    background-color: red;
+    padding: 1rem 2rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    border: 1px solid white;
+    transition: all 0.15s ease-in;
+}
+
+.admin-cards .button[aria-disabled=true] {
+    background-color: grey;
+    cursor: not-allowed;
+}
+
+.admin-cards .button:not([aria-disabled=true]):hover {
+    background-color: white;
+    color: red;
+    border-color: red;
+}
+
+.admin-cards .card :where(.edit-icon, .delete-icon) {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.admin-cards .card .edit-icon svg {
+    width: 1rem;
+}
+
+.admin-cards .card .delete-icon svg {
+    width: 1rem;
+}

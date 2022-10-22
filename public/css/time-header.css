@@ -3,8 +3,8 @@
     grid-template-columns: 2rem auto auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
     gap: 1rem;
     text-align: center;
-    font-size: 1.4rem;
-    padding: 0.5rem;
+    font-size: 1.6rem;
+    padding: 1rem;
     align-items: center;
 }
 

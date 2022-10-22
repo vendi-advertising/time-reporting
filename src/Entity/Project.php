@@ -191,7 +191,12 @@ class Project
         return $this->projectCategory;
     }
 
-    public function setProjectCategory(?ProjectCategory $projectCategory): self
+    public function removeProjectCategory(): void
+    {
+        $this->projectCategory = null;
+    }
+
+    public function setProjectCategory(ProjectCategory $projectCategory): self
     {
         $this->projectCategory = $projectCategory;
 
