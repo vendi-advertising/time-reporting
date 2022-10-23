@@ -27,11 +27,12 @@ class ProjectCategory
     #[ORM\Column(nullable: true)]
     private ?bool $isDefault = null;
 
-    public function __construct(string $name, int $sortOrder = 10000)
+    public function __construct(string $name, int $sortOrder = 10000, bool $isDefault = false)
     {
         $this->projects = new ArrayCollection();
         $this->name = $name;
         $this->sortOrder = $sortOrder;
+        $this->isDefault = $isDefault;
     }
 
     public function getId(): ?int

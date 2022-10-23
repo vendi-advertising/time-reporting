@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 
 #[Route('/admin/project-category', name: 'admin_project_category_')]
@@ -20,21 +21,52 @@ class ProjectController extends AbstractController
     private const TOKEN_FOR_PROJECT_CATEGORY_SAVE = 'project-category-post';
     private const TOKEN_FOR_PROJECT_GRID = 'project-grid-post';
 
+    public function __construct(
+        private readonly ProjectCategoryRepository $projectCategoryRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly RouterInterface $router,
+        private readonly ProjectRepository $projectRepository,
+        private readonly ClientRepository $clientRepository,
+    ) {
+    }
+
+    private function isProjectCategoryNameAlreadyInUse(string $name, ?ProjectCategory $existingProjectCategory = null): bool
+    {
+        $items = $this->projectCategoryRepository->findBy(['name' => $name]);
+        foreach ($items as $item) {
+            if ($existingProjectCategory && ($item->getId() !== $existingProjectCategory->getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function markAllProjectCategoriesAsNotDefault(): void
+    {
+        foreach ($this->projectCategoryRepository->findBy(['isDefault' => true]) as $projectCategory) {
+            $projectCategory->setIsDefault(false);
+            $this->entityManager->persist($projectCategory);
+        }
+
+        $this->entityManager->flush();
+    }
+
     #[Route('/grid', name: 'grid', methods: ['GET'])]
-    public function projectCategoryGrid(ProjectCategoryRepository $projectCategoryRepository, ClientRepository $clientRepository): Response
+    public function grid(): Response
     {
         return $this->render(
             'admin/project-category-grid.html.twig',
             [
-                'clients' => $clientRepository->findAllActiveClientsAndProjects(),
-                'project_categories' => $projectCategoryRepository->findAll(),
+                'clients' => $this->clientRepository->findAllActiveClientsAndProjects(),
+                'project_categories' => $this->projectCategoryRepository->findAll(),
                 'csrf_token_name' => self::TOKEN_FOR_PROJECT_GRID,
             ]
         );
     }
 
     #[Route('/grid', name: 'grid_save', methods: ['POST'])]
-    public function projectCategoryGridSave(ProjectCategoryRepository $projectCategoryRepository, ProjectRepository $projectRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function gridSave(Request $request): Response
     {
         $submittedToken = $request->request->get('token');
         if (!$this->isCsrfTokenValid(self::TOKEN_FOR_PROJECT_GRID, $submittedToken)) {
@@ -54,38 +86,42 @@ class ProjectController extends AbstractController
 
             [, $projectId] = $projectParts;
 
-            $project = $projectRepository->find((int)$projectId);
+            $project = $this->projectRepository->find((int)$projectId);
             if (!$project) {
                 throw new TimeReportingException('Could not find project');
             }
 
-            $projectCategory = $projectCategoryRepository->find((int)$value);
+            $projectCategory = $this->projectCategoryRepository->find((int)$value);
+            if (!$projectCategory) {
+                throw new TimeReportingException('Could not find project category');
+            }
 
             $project->setProjectCategory($projectCategory);
-            $entityManager->persist($project);
+            $this->entityManager->persist($project);
         }
 
-        $entityManager->flush();
+        $this->entityManager->flush();
 
         $this->addFlash('success', 'Updated project categories');
 
         return $this->redirectToRoute('admin_project_category_grid');
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
-    public function projectCategoryList(ProjectCategoryRepository $projectCategoryRepository): Response
+    #[Route('/new', name: 'new', methods: ['GET'])]
+    public function create(): Response
     {
         return $this->render(
             'admin/project-categories-list.html.twig',
             [
-                'project_categories' => $projectCategoryRepository->findAll(),
+                'form_action' => $this->router->generate('admin_project_category_new_save'),
+                'project_categories' => $this->projectCategoryRepository->findAll(),
                 'csrf_token_name' => self::TOKEN_FOR_PROJECT_CATEGORY_SAVE,
             ]
         );
     }
 
-    #[Route('', name: 'save', methods: ['POST'])]
-    public function projectCategorySave(Request $request, ProjectCategoryRepository $projectCategoryRepository, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'new_save', methods: ['POST'])]
+    public function createSave(Request $request): Response
     {
         $submittedToken = $request->request->get('token');
         if (!$this->isCsrfTokenValid(self::TOKEN_FOR_PROJECT_CATEGORY_SAVE, $submittedToken)) {
@@ -93,75 +129,80 @@ class ProjectController extends AbstractController
         }
 
         $newProjectCategoryName = $request->request->get('project-category-name');
-        $newSortOrder = $request->request->getInt('sort-order');
-
-        //TODO: Need to unset other defaults
+        $sortOrder = $request->request->getInt('sort-order');
         $isDefault = $request->request->getBoolean('is-default', false);
-        $existingId = $request->request->getInt('project-category-id');
-
-        //TODO: Make dedicated route
-        if ($existingId) {
-            $existing = $projectCategoryRepository->find($existingId);
-            if (!$existing) {
-                $this->addFlash('error', 'Could not find project category to edit');
-
-                return $this->redirectToRoute('admin_project_category_edit', ['projectCategory' => $existingId]);
-            }
-
-            $allExistingWithThisName = $projectCategoryRepository->findBy(['name' => $newProjectCategoryName]);
-            foreach ($allExistingWithThisName as $existingProjectCategory) {
-                if ($existingProjectCategory->getId() !== $existingId) {
-                    $this->addFlash('error', 'A category with that name already exists');
-
-                    return $this->redirectToRoute('admin_project_category_edit', ['projectCategory' => $existingId]);
-                }
-            }
-
-            $existing->setName($newProjectCategoryName);
-            $existing->setSortOrder($newSortOrder);
-            $existing->setIsDefault($isDefault);
-            $entityManager->persist($existing);
-            $entityManager->flush();
-            $this->addFlash('success', 'Project category updated');
-
-            return $this->redirectToRoute('admin_index');
-        }
 
         if (!$newProjectCategoryName) {
             $this->addFlash('error', 'Please enter a name');
 
-            return $this->redirectToRoute('admin_project_category_list');
+            return $this->redirectToRoute('admin_project_category_new');
         }
 
-        $existing = $projectCategoryRepository->findOneBy(['name' => $newProjectCategoryName]);
-        if ($existing) {
+        if ($this->isProjectCategoryNameAlreadyInUse($newProjectCategoryName)) {
             $this->addFlash('error', 'A category with that name already exists');
 
-            return $this->redirectToRoute('admin_project_category_list');
+            return $this->redirectToRoute('admin_project_category_new');
         }
 
-        $pc = new ProjectCategory($newProjectCategoryName, $newSortOrder);
-        $entityManager->persist($pc);
-        $entityManager->flush();
+        if ($isDefault) {
+            $this->markAllProjectCategoriesAsNotDefault();
+        }
+
+        $pc = new ProjectCategory($newProjectCategoryName, $sortOrder, $isDefault);
+        $this->entityManager->persist($pc);
+        $this->entityManager->flush();
         $this->addFlash('success', 'New project category added');
 
         return $this->redirectToRoute('admin_index');
     }
 
-    #[Route('/{projectCategory}', name: 'edit')]
-    public function projectCategoryEdit(ProjectCategory $projectCategory): Response
+    #[Route('/edit/{projectCategory}', name: 'edit', methods: ['GET'])]
+    public function edit(ProjectCategory $projectCategory): Response
     {
         return $this->render(
             'admin/project-category-edit.html.twig',
             [
+                'form_action' => $this->router->generate('admin_project_category_edit_save', ['projectCategory' => $projectCategory->getId()]),
                 'project_category' => $projectCategory,
                 'csrf_token_name' => self::TOKEN_FOR_PROJECT_CATEGORY_SAVE,
             ]
         );
     }
 
+    #[Route('/edit/{projectCategory}', name: 'edit_save', methods: ['POST'])]
+    public function editSave(Request $request, ProjectCategory $projectCategory): Response
+    {
+        $submittedToken = $request->request->get('token');
+        if (!$this->isCsrfTokenValid(self::TOKEN_FOR_PROJECT_CATEGORY_SAVE, $submittedToken)) {
+            throw new InvalidCsrfTokenException();
+        }
+
+        $newProjectCategoryName = $request->request->get('project-category-name');
+        $sortOrder = $request->request->getInt('sort-order');
+        $isDefault = $request->request->getBoolean('is-default', false);
+
+        if ($this->isProjectCategoryNameAlreadyInUse($newProjectCategoryName, $projectCategory)) {
+            $this->addFlash('error', 'A category with that name already exists');
+
+            return $this->redirectToRoute('admin_project_category_edit', ['projectCategory' => $projectCategory->getId()]);
+        }
+
+        if ($isDefault) {
+            $this->markAllProjectCategoriesAsNotDefault();
+        }
+
+        $projectCategory->setName($newProjectCategoryName);
+        $projectCategory->setSortOrder($sortOrder);
+        $projectCategory->setIsDefault($isDefault);
+        $this->entityManager->persist($projectCategory);
+        $this->entityManager->flush();
+        $this->addFlash('success', 'Project category updated');
+
+        return $this->redirectToRoute('admin_index');
+    }
+
     #[Route('/delete/{projectCategory}', name: 'delete', methods: ['POST'])]
-    public function delete(ProjectCategory $projectCategory, Request $request, EntityManagerInterface $entityManager, ProjectRepository $projectRepository): Response
+    public function delete(ProjectCategory $projectCategory, Request $request): Response
     {
         $submittedToken = $request->request->get('token');
         $submittedTokenId = $request->request->get('token-id');
@@ -169,14 +210,14 @@ class ProjectController extends AbstractController
             throw new InvalidCsrfTokenException();
         }
 
-        $projectsWithThisCategory = $projectRepository->findBy(['projectCategory' => $projectCategory]);
+        $projectsWithThisCategory = $this->projectRepository->findBy(['projectCategory' => $projectCategory]);
         foreach ($projectsWithThisCategory as $project) {
             $project->removeProjectCategory();
-            $entityManager->persist($project);
+            $this->entityManager->persist($project);
         }
 
-        $entityManager->remove($projectCategory);
-        $entityManager->flush();
+        $this->entityManager->remove($projectCategory);
+        $this->entityManager->flush();
 
         $this->addFlash('success', 'Successfully deleted project category');
 

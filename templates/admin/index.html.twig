@@ -26,6 +26,9 @@
                     {% for projectCategory in projectCategories %}
                         <li value="{{ projectCategory.sortOrder }}">
                             {{ projectCategory.name }}
+                            {% if(projectCategory.isDefault) %}
+                                - <em>Default</em>
+                            {% endif %}
                             <a
                                     href="{{ path('admin_project_category_edit', {'projectCategory': projectCategory.id}) }}"
                                     class="edit-icon"
@@ -60,7 +63,7 @@
             {% else %}
                 No product categories found
             {% endif %}
-            <a class="button" href="{{ path('admin_project_category_list') }}">Add Project Category</a>
+            <a class="button" href="{{ path('admin_project_category_new') }}">Add Project Category</a>
             <a class="button"
                     {% if projectCategories | length %}
                         href="{{ path('admin_project_category_grid') }}"
