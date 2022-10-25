@@ -3,120 +3,53 @@
 namespace App\Controller;
 
 use App\DTO\DayOfWeek;
-use App\DTO\ClientRollup\RollupClient;
-use App\DTO\ClientRollup\RollupReportByClient;
-use App\DTO\UserRollup\RollupReportByUser;
+use App\DTO\SimpleTimeEntry;
 use App\Entity\User;
-use App\Entity\UserTimeEntry;
 use App\Repository\ClientRepository;
 use App\Repository\UserTimeEntryRepository;
+use App\Service\DateUtility;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
+#[Route('/app/time', name: 'time')]
 class TimeController extends AbstractController
 {
-    #[Route('/app/report/user/{dateStart}', name: 'report_user')]
-    public function reportByUser(UserTimeEntryRepository $userTimeEntryRepository, ClientRepository $clientRepository, ?int $dateStart = null): Response
-    {
-        if (!$dateStart) {
-            $dateStartObj = new DateTimeImmutable;
-        } else {
-            $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
-        }
-
-        /** @var UserTimeEntry[] $entries */
-        $entries = $userTimeEntryRepository->rollupReport((int)$dateStartObj->format('Ymd'));
-        $report = new RollupReportByUser($entries);
-
-        $monday = $dateStartObj->modify('Monday this week');
-        $previousWeek = $monday->modify('-7 days');
-        $nextWeek = $monday->modify('+7 days');
-
-//        dump($report);
-
-        return $this->render(
-            'report/by-user.html.twig',
-            [
-                'thisWeek' => $monday->format('m/d/Y'),
-                'previousWeek' => $previousWeek->format('Ymd'),
-                'nextWeek' => $nextWeek->format('Ymd'),
-                'report' => $report,
-            ]
-        );
+    public function __construct(
+        private readonly DateUtility $dateUtility
+    ) {
     }
 
-    #[Route('/app/report/client/{dateStart}', name: 'report_client')]
-    public function reportByClient(UserTimeEntryRepository $userTimeEntryRepository, ClientRepository $clientRepository, ?int $dateStart = null): Response
-    {
-        if (!$dateStart) {
-            $dateStartObj = new DateTimeImmutable;
-        } else {
-            $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
-        }
-
-        /** @var UserTimeEntry[] $entries */
-        $entries = $userTimeEntryRepository->rollupReport((int)$dateStartObj->format('Ymd'));
-        $report = new RollupReportByClient($entries);
-
-        $monday = $dateStartObj->modify('Monday this week');
-        $previousWeek = $monday->modify('-7 days');
-        $nextWeek = $monday->modify('+7 days');
-
-        return $this->render(
-            'report/by-client.html.twig',
-            [
-                'thisWeek' => $monday->format('m/d/Y'),
-                'previousWeek' => $previousWeek->format('Ymd'),
-                'nextWeek' => $nextWeek->format('Ymd'),
-                'report' => $report,
-            ]
-        );
-    }
-
-    #[Route('/app/time/{dateStart}', name: 'time')]
+    #[Route('/{dateStart}', name: '')]
     public function index(ClientRepository $clientRepository, UserTimeEntryRepository $userTimeEntryRepository, Security $security, ?int $dateStart = null): Response
     {
-        if (!$dateStart) {
-            $dateStartObj = new DateTimeImmutable;
-        } else {
-            $dateStartObj = DateTimeImmutable::createFromFormat('Ymd', (string)$dateStart);
-        }
-
-        $monday = $dateStartObj->modify('Monday this week');
-        $friday = $monday->modify('+4 day');
-        $previousWeek = $monday->modify('-7 days');
-        $nextWeek = $monday->modify('+7 days');
+        $firstDayOfWeek = $this->dateUtility->getCurrentDate($dateStart);
 
         /** @var User $user */
         $user = $security->getUser();
 
-        $userTimeEntriesEntities = $userTimeEntryRepository->findAllByUserAndDateRange($user, $monday, $friday);
+        $userTimeEntriesEntities = $userTimeEntryRepository->findAllByUserAndDateRange($user, $firstDayOfWeek);
 
         $userTimeEntriesArray = [];
         foreach ($userTimeEntriesEntities as $userTimeEntry) {
-            $userTimeEntriesArray[$userTimeEntry->getProject()->getId()][$userTimeEntry->getEntryDate()->format('Y-m-d')] = $userTimeEntry->getHours();
+            $userTimeEntriesArray[$userTimeEntry->getProject()->getId()][$userTimeEntry->getEntryDate()->format('Y-m-d')] = new SimpleTimeEntry($userTimeEntry->getHours(), $userTimeEntry->getComment());
         }
 
         return $this->render(
             'time/index.html.twig',
             [
+                'label' => sprintf('%1$s - %2$s', $firstDayOfWeek->format('M j'), $firstDayOfWeek->modify('+5 days')->format('M j')),
                 'clients' => $clientRepository->findAllActiveClientsAndProjects(),
                 'controller_name' => 'TimeController',
+                'apiEndpointComment' => $this->generateUrl('api_time_add_comment'),
                 'apiEndpointTimeEntry' => $this->generateUrl('api_time_add'),
                 'apiEndpointFavorites' => $this->generateUrl('api_time_favorite'),
-                'dates' => [
-                    new DayOfWeek('Monday', $monday->format('m/d'), $monday->format('Y-m-d')),
-                    new DayOfWeek('Tuesday', $monday->modify('+1 day')->format('m/d'), $monday->modify('+1 day')->format('Y-m-d')),
-                    new DayOfWeek('Wednesday', $monday->modify('+2 day')->format('m/d'), $monday->modify('+2 day')->format('Y-m-d')),
-                    new DayOfWeek('Thursday', $monday->modify('+3 day')->format('m/d'), $monday->modify('+3 day')->format('Y-m-d')),
-                    new DayOfWeek('Friday', $monday->modify('+4 day')->format('m/d'), $monday->modify('+4 day')->format('Y-m-d')),
-                ],
+                'weekday' => new DayOfWeek('Monday', $firstDayOfWeek->format('m/d'), $firstDayOfWeek->format('Y-m-d')),
                 'userTimeEntries' => $userTimeEntriesArray,
-                'previousWeek' => $previousWeek->format('Ymd'),
-                'nextWeek' => $nextWeek->format('Ymd'),
+                'previousWeek' => $firstDayOfWeek->modify('-7 days')->format('Ymd'),
+                'nextWeek' => $firstDayOfWeek->modify('+7 days')->format('Ymd'),
                 'favoriteProjects' => $user->getFavoriteProjects(),
                 'favoriteClients' => $user->getFavoriteClients(),
             ]

@@ -5,7 +5,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/time.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/time-header.css') }}">
 {% endblock %}
 
 {% block javascripts %}
@@ -13,20 +12,28 @@
     <script>
         window.apiEndpointTimeEntry = '{{ apiEndpointTimeEntry }}';
         window.apiEndpointFavorites = '{{ apiEndpointFavorites }}';
+        window.apiEndpointComment = '{{ apiEndpointComment }}';
     </script>
     <script src="{{ asset('js/favorites.js') }}" defer></script>
     <script src="{{ asset('js/time.js') }}" defer></script>
 {% endblock %}
 
+{% macro favorite_button(name) %}
+    <button class="favorite-icon" data-role="favorite"
+            data-aria-label-add="Add {{ name }} to favorites"
+            data-aria-label-remove="Remove {{ name }} from favorites"
+    >★
+    </button>
+{% endmacro %}
+
 {% block main %}
     <div class="time-header">
-        <span></span>
-        <span></span>
         <a href="{{ path('time', {'dateStart' : previousWeek}) }}" class="arrow older">&laquo;</a>
-        {% for weekday in dates %}
-            <span>{{ weekday.name }}<br/>{{ weekday.displayDate }}</span>
-        {% endfor %}
+        {{ label }}
         <a href="{{ path('time', {'dateStart' : nextWeek}) }}" class="arrow newer">&raquo;</a>
+    </div>
+    <div class="time-header">
+        <label>Only show favorites <input type="checkbox" data-role="only-show-favorites"/></label>
     </div>
     {% for client in clients %}
         <details>
@@ -36,23 +43,14 @@
                     data-object-name="{{ client.name }}"
                     data-is-favorite="{{ client.id in favoriteClients ? 'true' : 'false' }}"
             >
-                <button class="favorite-icon" data-role="favorite"
-                        data-aria-label-add="Add {{ client.name }} to favorites"
-                        data-aria-label-remove="Remove {{ client.name }} from favorites"
-                >★
-                </button>
-                <span>
+                {{ _self.favorite_button(client.name) }}
+                <span class="client-name">
                     {{ client.name }}
                 </span>
-                {% for weekday in dates %}
-                    <span
-                            class="time-entry-header"
-                            data-date="{{ weekday.idDate }}"
-                    ></span>
-                {% endfor %}
-                <button class="accordion-toggle">
-                    <span>+</span>
-                </button>
+                <span
+                        class="time-entry-header"
+                        data-date="{{ weekday.idDate }}"
+                ></span>
             </summary>
             <ul>
                 {% for project in client.projects %}
@@ -62,25 +60,29 @@
                             data-object-name="{{ project.name }}"
                             data-is-favorite="{{ project.id in favoriteProjects ? 'true' : 'false' }}"
                     >
-                        <button class="favorite-icon" data-role="favorite"
-                                data-aria-label-add="Add {{ project.name }} to favorites"
-                                data-aria-label-remove="Remove {{ project.name }} from favorites"
-                        >★
-                        </button>
+                        {{ _self.favorite_button(project.name) }}
                         <span>
                             {{ project.name }}
                         </span>
-                        {% for weekday in dates %}
-                            <input
-                                    {% if userTimeEntries[project.id][weekday.idDate] is defined %}
-                                        value="{{ userTimeEntries[project.id][weekday.idDate] }}"
-                                    {% endif %}
-                                    data-date="{{ weekday.idDate }}"
-                                    type="number"
-                                    data-role="time-entry-field"
-                                    name="{{ project.id }}|{{ weekday.idDate }}"
-                                    placeholder="0" step="0.25" min="0" max="100"/>
-                        {% endfor %}
+                        <input
+                                type="text"
+                                name="{{ project.id }}|{{ weekday.idDate }}"
+                                class="comment"
+                                data-role="time-entry-comment"
+                                {% if userTimeEntries[project.id][weekday.idDate] is defined %}
+                                    value="{{ userTimeEntries[project.id][weekday.idDate].comment }}"
+                                {% endif %}
+                        />
+                        <input
+                                {% if userTimeEntries[project.id][weekday.idDate] is defined %}
+                                    value="{{ userTimeEntries[project.id][weekday.idDate].hours }}"
+                                {% endif %}
+                                data-date="{{ weekday.idDate }}"
+                                type="number"
+                                data-role="time-entry-field"
+                                name="{{ project.id }}|{{ weekday.idDate }}"
+                                aria-label="Time entry for: {{ project.code }} - {{ project.name }}"
+                                placeholder="0" step="0.25" min="0" max="100"/>
                     </li>
                 {% endfor %}
             </ul>

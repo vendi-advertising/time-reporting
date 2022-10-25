@@ -30,6 +30,9 @@ class UserTimeEntry
     #[ORM\Column]
     private int $entryDateInt;
 
+    #[ORM\Column(length: 1024, nullable: true)]
+    private ?string $comment = null;
+
     public function __construct(User $user, Project $project, DateTimeImmutable|int $entryDate)
     {
         $this->user = $user;
@@ -70,5 +73,17 @@ class UserTimeEntry
     public function getEntryDateInt(): ?int
     {
         return $this->entryDateInt;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
+
+        return $this;
     }
 }

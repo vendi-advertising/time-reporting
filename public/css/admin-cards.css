@@ -1,9 +1,13 @@
 .admin-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 40rem);
+    justify-content: center;
+    gap: 2rem;
+    margin-block-start: 4rem;
 }
 
 .admin-cards .card {
     border: 1px solid black;
-    max-width: 40rem;
     padding: 2rem;
 }
 
