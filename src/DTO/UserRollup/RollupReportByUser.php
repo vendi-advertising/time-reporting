@@ -2,9 +2,10 @@
 
 namespace App\DTO\UserRollup;
 
+use App\DTO\GenericRollup\RollupReportInterface;
 use App\Entity\UserTimeEntry;
 
-class RollupReportByUser
+class RollupReportByUser implements RollupReportInterface
 {
     /**
      * @var RollupUser[]
@@ -14,7 +15,7 @@ class RollupReportByUser
     /**
      * @param UserTimeEntry[] $userTimeEntries
      */
-    public function __construct(array $userTimeEntries)
+    public function setItems(array $userTimeEntries): void
     {
         foreach ($userTimeEntries as $userTimeEntry) {
             $clientId = $userTimeEntry->getProject()->getClient()->getId();

@@ -13,13 +13,7 @@
                 <li><a href="{{ path('report_client') }}">Rollup Report - By Clients</a></li>
                 <li><a href="{{ path('report_user') }}">Rollup Report - By Users</a></li>
                 {% if app.user.isAdmin %}
-                    <li>
-                        <strong>Admin</strong>
-                        <ul>
-                            <li><a href="{{ path('admin_project_categories_list') }}">Project Categories</a></li>
-                            <li><a href="{{ path('admin_project_category_grid') }}">Project Grid</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="{{ path('admin_index') }}">Admin</a></li>
                 {% endif %}
             </ul>
         </nav>

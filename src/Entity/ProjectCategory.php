@@ -24,11 +24,15 @@ class ProjectCategory
     #[ORM\Column(type: 'integer')]
     private int $sortOrder;
 
-    public function __construct(string $name, int $sortOrder = 10000)
+    #[ORM\Column(nullable: true)]
+    private ?bool $isDefault = null;
+
+    public function __construct(string $name, int $sortOrder = 10000, bool $isDefault = false)
     {
         $this->projects = new ArrayCollection();
         $this->name = $name;
         $this->sortOrder = $sortOrder;
+        $this->isDefault = $isDefault;
     }
 
     public function getId(): ?int
@@ -86,6 +90,18 @@ class ProjectCategory
     public function setSortOrder(int $sortOrder): self
     {
         $this->sortOrder = $sortOrder;
+
+        return $this;
+    }
+
+    public function isIsDefault(): ?bool
+    {
+        return $this->isDefault;
+    }
+
+    public function setIsDefault(?bool $isDefault): self
+    {
+        $this->isDefault = $isDefault;
 
         return $this;
     }

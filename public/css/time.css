@@ -1,7 +1,32 @@
 :root {
-    --time-left-column-width: 2rem;
-    --time-right-column-width: 2rem;
+    --time-client-favorite-width: 2rem;
+    --time-project-favorite-width: 2rem;
+    --time-label-column-width: auto;
+    --time-comment-column-width: 20rem;
     --time-input-column-width: 8rem;
+}
+
+.time-header {
+    text-align: center;
+    font-size: 1.6rem;
+    padding: 1rem;
+}
+
+.time-header .arrow {
+    text-decoration: none;
+    color: black;
+}
+
+.time-header .older {
+    justify-self: end;
+}
+
+.time-header .newer {
+    justify-self: start;
+}
+
+details.hidden {
+    display: none;
 }
 
 details ::marker {
@@ -25,16 +50,20 @@ details li[data-is-favorite~=true] > .favorite-icon {
 }
 
 details summary {
-    font-size: 1.6rem;
-    padding: 0.5rem;
+    font-size: 2rem;
+    padding: 1rem;
     cursor: pointer;
     border: 1px solid black;
     border-bottom: none;
     display: grid;
-    grid-template-columns: var(--time-left-column-width) auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
+    grid-template-columns: var(--time-client-favorite-width) var(--time-project-favorite-width) var(--time-label-column-width) var(--time-comment-column-width) var(--time-input-column-width);
     gap: 1rem;
     align-items: center;
     user-select: none;
+}
+
+details summary > .client-name {
+    grid-column: 2 / 5;
 }
 
 details summary .time-entry-header {
@@ -66,12 +95,11 @@ details :where(ul,li) {
 }
 
 details li {
-    padding-block: 1rem;
     display: grid;
-    grid-template-columns: var(--time-left-column-width) max-content auto repeat(5, var(--time-input-column-width)) var(--time-right-column-width);
+    grid-template-columns: var(--time-client-favorite-width) var(--time-project-favorite-width) var(--time-label-column-width) var(--time-comment-column-width) var(--time-input-column-width);
     gap: 1rem;
-    padding: 0.5rem;
-    font-size: 1.3rem;
+    padding: 1rem;
+    font-size: 1.6rem;
     border: 1px solid rgba(0, 0, 0, 0.25);
     align-items: center;
 }
@@ -100,5 +128,9 @@ details li input[type=number] {
     max-width: 4em;
     padding: 0.3rem;
     margin-inline: auto;
-    font-size: 1rem;
+    font-size: 1.6rem;
+}
+
+details input.comment {
+    width: 20rem;
 }

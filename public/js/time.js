@@ -41,7 +41,7 @@
 
         bindAllInputs = () => {
             document
-                .querySelectorAll('[data-role~=time-entry-field]')
+                .querySelectorAll('[data-role~=time-entry-field], [data-role~=time-entry-comment]')
                 .forEach(
                     (input) => {
 
@@ -54,8 +54,10 @@
                                     data.append('field', input.getAttribute('name'));
                                     data.append('value', input.value);
 
+                                    const endpoint = input.getAttribute('data-role').includes('time-entry-field') ? window.apiEndpointTimeEntry : window.apiEndpointComment;
+
                                     fetch(
-                                        window.apiEndpointTimeEntry,
+                                        endpoint,
                                         {
                                             method: 'POST',
                                             body: data

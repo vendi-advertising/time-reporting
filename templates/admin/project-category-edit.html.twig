@@ -1,2 +1,8 @@
-{% include('includes/flash-messages.html.twig') %}
-{% include('admin/macro-project-category-form.html.twig') %}
+{% extends 'logged-in-base.html.twig' %}
+
+{% block title %}Time Reporting - Edit Project Category{% endblock %}
+
+{% block main %}
+    {% include('includes/flash-messages.html.twig') %}
+    {% include('admin/macro-project-category-form.html.twig') %}
+{% endblock %}

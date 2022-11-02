@@ -55,3 +55,10 @@ symfony console app:harvest:import:project-budgets
 ## Usage
 
 Visit https://tr.wip/login
+
+## Attribution
+
+### Icons
+
+* Pencil: https://www.iconfinder.com/icons/115700/pen_write_edit_pencil_icon
+* Trash can: https://www.iconfinder.com/icons/1814090/delete_garbage_trash_icon

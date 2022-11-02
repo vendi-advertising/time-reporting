@@ -47,19 +47,17 @@ class UserTimeEntryRepository extends ServiceEntityRepository
     /**
      * @param User $user
      * @param DateTimeInterface $start
-     * @param DateTimeInterface $end
      * @return UserTimeEntry[]
      */
-    public function findAllByUserAndDateRange(User $user, DateTimeInterface $start, DateTimeInterface $end): array
+    public function findAllByUserAndDateRange(User $user, DateTimeInterface $start): array
     {
         $qb = $this->createQueryBuilder('e');
 
         return $qb
             ->andWhere('e.user = :user')
-            ->andWhere($qb->expr()->between('e.entryDateInt', ':start', ':end'))
+            ->andWhere('e.entryDateInt = :start')
             ->setParameter('user', $user)
             ->setParameter('start', (int)$start->format('Ymd'))
-            ->setParameter('end', (int)$end->format('Ymd'))
             ->getQuery()
             ->getResult();
     }

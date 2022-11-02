@@ -1,4 +1,4 @@
-<form action="{{ path('admin_project_categories_save') }}" method="post">
+<form action="{{ form_action }}" method="post">
     <input type="hidden" name="token" value="{{ csrf_token(csrf_token_name) }}"/>
     {% if project_category is defined %}
         <input type="hidden" name="project-category-id" value="{{ project_category.id }}"/>
@@ -21,6 +21,16 @@
 
         <input type="number" name="sort-order" required
                value="{{ project_category is defined ? project_category.sortOrder : 0 }}"/>
+    </label>
+    <br/>
+    <label>
+        Make default product category
+
+        <input type="checkbox" name="is-default" value="true"
+                {% if project_category is defined and project_category.isDefault %}
+                    checked
+                {% endif %}
+        />
     </label>
     <br/>
     <input type="submit" value="Submit"/>

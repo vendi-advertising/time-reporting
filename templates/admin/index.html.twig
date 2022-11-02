@@ -1,0 +1,82 @@
+{% extends 'logged-in-base.html.twig' %}
+
+{% block title %}Time Reporting - Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/admin-cards.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dialog-confirmation.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/admin-post-link.js') }}" defer></script>
+{% endblock %}
+
+{% block main %}
+
+    {% include('includes/flash-messages.html.twig') %}
+
+    <div class="admin-cards">
+
+        <div class="card">
+            <h2>Project Categories</h2>
+            {% if projectCategories | length %}
+                <ol>
+                    {% for projectCategory in projectCategories %}
+                        <li value="{{ projectCategory.sortOrder }}">
+                            {{ projectCategory.name }}
+                            {% if(projectCategory.isDefault) %}
+                                - <em>Default</em>
+                            {% endif %}
+                            <a
+                                    href="{{ path('admin_project_category_edit', {'projectCategory': projectCategory.id}) }}"
+                                    class="edit-icon"
+                                    aria-label="Edit project category: {{ projectCategory.name }}"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
+                                    <path d="M29.4 2.6a8.5 8.5 0 0 0-6-2.6c-1.8 0-3.4.7-4.6 1.9l-4.9 4.9L3.4 17.3a4 4 0 0 0-1 1.7L.2 27.5l-.2 1c0 2 1.6 3.5 3.5 3.5l1.2-.2 8.4-2.2a4 4 0 0 0 1.7-1l15.3-15.4c2.8-2.8 2.5-7.4-.7-10.6zM16 23.8c0-1-.3-1.8-.7-2.6l9.4-9.5c.6 1.8.3 3.8-1 5L16 24.6v-.7zm-1.2-3.5a9 9 0 0 0-1.3-1.8 9 9 0 0 0-2-1.5L21 7.5a7 7 0 0 1 3.3 3.2l-9.5 9.6zm-4.3-3.7a8 8 0 0 0-2.9-.6l7.7-7.8a4.8 4.8 0 0 1 4.6-1l-9.4 9.4zM4.2 29.9l-.7.1c-.8 0-1.5-.7-1.5-1.5l.1-.6 1-3.8c1.2 0 2.4.4 3.4 1.4 1 1 1.4 2.2 1.4 3.4l-3.7 1zm4.7-1.3c0-1.3-.6-2.7-1.7-3.8-1-1-2.4-1.6-3.8-1.7l1-3.6.4-.7c2-1.4 5.1-1 7.3 1.1 2.2 2.3 2.6 5.6.8 7.6a2 2 0 0 1-.3.2l-3.7 1zm19.8-16.8L27 13.5v-.7c-.2-2-1-3.8-2.5-5.3a8.5 8.5 0 0 0-6-2.5l1.7-1.7c.8-.8 2-1.3 3.2-1.3 1.7 0 3.3.7 4.6 2a6.6 6.6 0 0 1 2 4.2c0 1.4-.4 2.6-1.3 3.6z"/>
+                                </svg>
+                            </a>
+                            <a
+                                    role="button"
+                                    class="delete-icon"
+                                    aria-label="Delete project category: {{ projectCategory.name }}"
+                                    data-link="{{ path('admin_project_category_delete', {'projectCategory': projectCategory.id}) }}"
+                                    data-role="post-link with-modal"
+                                    data-csrf-id="{{ 'delete-' ~ projectCategory.id }}"
+                                    data-csrf="{{ csrf_token('delete-' ~ projectCategory.id ) }}"
+                                    data-modal-title="Confirm deletion"
+                                    data-modal-content="Please confirm that you wish to delete project category {{ projectCategory.name }}"
+                                    data-modal-button="Delete"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 47.9" fill="currentColor">
+                                    <path d="M12 14.9h3v24h-3z"/>
+                                    <path d="M18 14.9h3v24h-3z"/>
+                                    <path d="M24 14.9h3v24h-3z"/>
+                                    <path d="M39 5.9H26.9V4.4c0-2.4-2-4.4-4.4-4.4h-6c-2.4 0-4.4 2-4.4 4.4v1.5H0v3h3.1l2.7 34.6a4.9 4.9 0 0 0 4.7 4.4h18c2.4 0 4.5-1.9 4.7-4.4l2.7-34.6H39v-3zM14.9 4.4c0-.9.7-1.6 1.6-1.6h6c.9 0 1.6.7 1.6 1.6v1.5h-9.2V4.4zm15.3 38.9c0 .8-.8 1.6-1.7 1.6h-18c-.8 0-1.6-.7-1.7-1.6L6.1 8.9h26.8l-2.7 34.4z"/>
+                                </svg>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                No product categories found
+            {% endif %}
+            <a class="button" href="{{ path('admin_project_category_new') }}">Add Project Category</a>
+            <a class="button"
+                    {% if projectCategories | length %}
+                        href="{{ path('admin_project_category_grid') }}"
+                    {% else %}
+                        aria-disabled="true"
+                        role="link"
+                    {% endif %}
+            >Assign Project Categories</a>
+        </div>
+
+        <div class="card">
+            <h2>Settings</h2>
+        </div>
+
+    </div>
+{% endblock %}

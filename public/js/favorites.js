@@ -6,6 +6,50 @@
         // Variable aliasing
         document = window.document,
 
+        bindToggleFavorites = () => {
+            document
+                .querySelectorAll('[data-role~=only-show-favorites]')
+                .forEach(
+                    (button) => {
+                        button
+                            .addEventListener(
+                                'click',
+                                () => {
+                                    const checked = button.checked;
+
+                                    document
+                                        .querySelectorAll('[data-role~=favorite]')
+                                        .forEach(
+                                            (favorite) => {
+                                                const
+                                                    details = favorite.closest('details'),
+                                                    summary = details.querySelector('summary'),
+                                                    childrenThatAreFavorites = details.querySelectorAll('[data-object-type~=project][data-is-favorite~=true]')
+                                                ;
+
+                                                details.classList.toggle('hidden', checked && summary.getAttribute('data-is-favorite') === 'false' && childrenThatAreFavorites.length === 0);
+
+                                                if (checked) {
+                                                    document
+                                                        .querySelectorAll('details:not(.hidden)')
+                                                        .forEach(
+                                                            (details) => {
+                                                                details.setAttribute('open', 'open');
+                                                            }
+                                                        )
+                                                    ;
+                                                }
+                                            }
+                                        )
+                                    ;
+                                }
+                            )
+                        ;
+                    }
+                )
+            ;
+        },
+
         bindAllFavoritesButtons = () => {
             document
                 .querySelectorAll('[data-role~=favorite]')
@@ -54,6 +98,7 @@
 
         run = () => {
             bindAllFavoritesButtons();
+            bindToggleFavorites();
         }
     ;
 
