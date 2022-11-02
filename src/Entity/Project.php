@@ -54,9 +54,9 @@ class Project
 
     #[ORM\ManyToMany(targetEntity: Task::class, inversedBy: 'projects')]
     private $tasks;
-
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: TimeEntry::class)]
-    private $timeEntries;
+//
+//    #[ORM\OneToMany(mappedBy: 'project', targetEntity: TimeEntry::class)]
+//    private $timeEntries;
 
     public function __construct(int $id, string $name, ?string $code, ?float $budget, bool $isActive, Client $client)
     {
@@ -244,33 +244,33 @@ class Project
         return $this;
     }
 
-    /**
-     * @return Collection|TimeEntry[]
-     */
-    public function getTimeEntries(): Collection
-    {
-        return $this->timeEntries;
-    }
-
-    public function addTimeEntry(TimeEntry $timeEntry): self
-    {
-        if (!$this->timeEntries->contains($timeEntry)) {
-            $this->timeEntries[] = $timeEntry;
-            $timeEntry->setProject($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTimeEntry(TimeEntry $timeEntry): self
-    {
-        if ($this->timeEntries->removeElement($timeEntry)) {
-            // set the owning side to null (unless already changed)
-            if ($timeEntry->getProject() === $this) {
-                $timeEntry->setProject(null);
-            }
-        }
-
-        return $this;
-    }
+//    /**
+//     * @return Collection|TimeEntry[]
+//     */
+//    public function getTimeEntries(): Collection
+//    {
+//        return $this->timeEntries;
+//    }
+//
+//    public function addTimeEntry(TimeEntry $timeEntry): self
+//    {
+//        if (!$this->timeEntries->contains($timeEntry)) {
+//            $this->timeEntries[] = $timeEntry;
+//            $timeEntry->setProject($this);
+//        }
+//
+//        return $this;
+//    }
+//
+//    public function removeTimeEntry(TimeEntry $timeEntry): self
+//    {
+//        if ($this->timeEntries->removeElement($timeEntry)) {
+//            // set the owning side to null (unless already changed)
+//            if ($timeEntry->getProject() === $this) {
+//                $timeEntry->setProject(null);
+//            }
+//        }
+//
+//        return $this;
+//    }
 }

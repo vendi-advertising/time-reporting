@@ -68,8 +68,8 @@ class User implements UserInterface
     #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'users')]
     private Collection $projects;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class)]
-    private Collection $timeEntries;
+//    #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class)]
+//    private Collection $timeEntries;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private array $favoriteProjects = [];

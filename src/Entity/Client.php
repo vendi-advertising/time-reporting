@@ -24,8 +24,8 @@ class Client
     #[ORM\OneToMany(mappedBy: "client", targetEntity: Project::class, fetch: 'EAGER')]
     private Collection $projects;
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: TimeEntry::class)]
-    private Collection $timeEntries;
+//    #[ORM\OneToMany(mappedBy: 'client', targetEntity: TimeEntry::class)]
+//    private Collection $timeEntries;
 
     private array $projectForReporting = [];
 

@@ -20,7 +20,7 @@ class TimeEntryFetcher extends AbstractSimpleFetcher
                 'query' => [
                     'from' => (new DateTimeImmutable('now -1 year'))->format(DateTimeInterface::ATOM),
                 ],
-            ]
+            ],
         );
     }
 }

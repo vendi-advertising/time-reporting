@@ -10,6 +10,7 @@ use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TimeEntryRepository::class)]
+#[ORM\Table(options: ["collate" => 'utf8mb4_unicode_ci', "charset" => 'utf8mb4'])]
 #[ApiEntity([User::class, Client::class, Project::class], TimeEntryFetcher::class)]
 class TimeEntry
 {
@@ -42,7 +43,7 @@ class TimeEntry
     #[ApiProperty('rounded_hours')]
     private float $hoursRounded;
 
-    #[ORM\Column(type: 'string', length: 1024, nullable: true)]
+    #[ORM\Column(length: 1024, nullable: true, options: ["collate" => 'utf8mb4_unicode_ci', "charset" => 'utf8mb4'])]
     #[ApiProperty]
     private ?string $notes = null;
 
