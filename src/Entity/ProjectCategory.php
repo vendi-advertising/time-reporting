@@ -94,7 +94,7 @@ class ProjectCategory
         return $this;
     }
 
-    public function isIsDefault(): ?bool
+    public function isDefault(): ?bool
     {
         return $this->isDefault;
     }

@@ -1,44 +1,53 @@
 {% extends 'logged-in-base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/admin-project-category-grid.css') }}">
+{% endblock %}
+
 {% block main %}
     {% include('includes/flash-messages.html.twig') %}
-    <form method="post">
-        <input type="submit" value="Submit"/>
+    <form method="post" class="admin-project-category-grid">
+        {#        <input type="submit" value="Submit"/> #}
         <input type="hidden" name="token" value="{{ csrf_token(csrf_token_name) }}"/>
-        <table border="1">
-            <thead>
-            <tr>
-                <td></td>
-                {% for pc in project_categories %}
-                    <th>{{ pc.name }}</th>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
+{#        <div class="category-header">#}
+{#            {% for pc in project_categories %}#}
+{#                <span>{{ pc.name }}</span>#}
+{#            {% endfor %}#}
+{#        </div>#}
+        <div class="clients">
             {% for client in clients %}
-                <tr>
-                    <td><strong>{{ client.name }}</strong></td>
-                    {% for pc in project_categories %}
-                        <td>
-{#                            <input name="client:{{ client.id }}" value="pc:{{ pc.id }}" type="radio"/>#}
-                        </td>
-                    {% endfor %}
-                </tr>
-                {% for project in client.projects %}
-                    <tr>
-                        <td>{{ project.name }}</td>
-                        {% for pc in project_categories %}
-                            <td><input name="project:{{ project.id }}" value="{{ pc.id }}" type="radio"
-                                        {% if project.projectCategory and project.projectCategory.id == pc.id %}
-                                            checked
-                                        {% endif %}
-                                /></td>
+                <details class="client">
+                    <summary>{{ client.name }}</summary>
+                    <div class="projects">
+                        <div class="category-header">
+                            {% for pc in project_categories %}
+                                <span>{{ pc.name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% for project in client.projects %}
+                            <div class="project">
+                                <span class="project-name">
+                                    {{ project.name }}
+                                </span>
+                                {% for pc in project_categories %}
+                                    <span>
+                                    <input
+                                            name="project:{{ project.id }}" value="{{ pc.id }}" type="radio"
+                                                {% if not project.projectCategory and default_project_category and default_project_category.id == pc.id %}
+                                                    checked
+                                                {% elseif project.projectCategory and project.projectCategory.id == pc.id %}
+                                                    checked
+                                                {% endif %}
+                                        />
+                                    </span>
+                                {% endfor %}
+                            </div>
                         {% endfor %}
-                    </tr>
-                {% endfor %}
+                    </div>
+                </details>
             {% endfor %}
-            </tbody>
-        </table>
+        </div>
         <input type="submit" value="Submit"/>
     </form>
 {% endblock %}

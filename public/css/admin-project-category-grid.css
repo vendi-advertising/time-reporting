@@ -1,0 +1,84 @@
+.admin-project-category-grid {
+    display: grid;
+    --header-column-width: 12rem;
+}
+
+.admin-project-category-grid:has(.category-header > span) {
+    grid-template-columns: 1fr repeat(1, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span) {
+    grid-template-columns: 1fr repeat(2, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span) {
+    grid-template-columns: 1fr repeat(3, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span) {
+    grid-template-columns: 1fr repeat(4, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span + span) {
+    grid-template-columns: 1fr repeat(5, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span + span + span) {
+    grid-template-columns: 1fr repeat(6, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span + span + span + span) {
+    grid-template-columns: 1fr repeat(7, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span + span + span + span + span) {
+    grid-template-columns: 1fr repeat(8, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span + span + span + span + span + span) {
+    grid-template-columns: 1fr repeat(9, var(--header-column-width));
+}
+
+.admin-project-category-grid:has(.category-header > span + span + span + span + span + span + span + span + span + span) {
+    grid-template-columns: 1fr repeat(10, var(--header-column-width));
+}
+
+.admin-project-category-grid .category-header,
+.admin-project-category-grid .clients,
+.admin-project-category-grid .clients .client,
+.admin-project-category-grid .clients .client .projects,
+.admin-project-category-grid .clients .client .projects .project {
+    display: contents;
+}
+
+.admin-project-category-grid .category-header > :first-child {
+    grid-column: 2;
+}
+
+.admin-project-category-grid .category-header > * {
+    text-align: center;
+    border-bottom: 1px solid black;
+}
+
+.admin-project-category-grid .clients summary::-webkit-details-marker {
+    display: none
+}
+
+.admin-project-category-grid .clients summary {
+    list-style-type: none;
+    grid-column: 1 / -1;
+    padding-block: 1rem;
+    border-block-end: 1px solid black;
+    padding-inline: 1rem;
+}
+
+.admin-project-category-grid .clients .client .projects .project .project-name {
+    text-align: left;
+    padding-inline-start: 2rem;
+}
+
+.admin-project-category-grid .clients .client .projects .project span {
+    text-align: center;
+    padding-block: 0.5rem;
+    border-block-end: 1px solid #ddd;
+}

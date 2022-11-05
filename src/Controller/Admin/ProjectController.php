@@ -55,11 +55,21 @@ class ProjectController extends AbstractController
     #[Route('/grid', name: 'grid', methods: ['GET'])]
     public function grid(): Response
     {
+        $projectCategories = $this->projectCategoryRepository->findAll();
+        $defaultProjectCategory = null;
+        foreach ($projectCategories as $projectCategory) {
+            if ($projectCategory->isDefault()) {
+                $defaultProjectCategory = $projectCategory;
+                break;
+            }
+        }
+
         return $this->render(
             'admin/project-category-grid.html.twig',
             [
                 'clients' => $this->clientRepository->findAllActiveClientsAndProjects(),
-                'project_categories' => $this->projectCategoryRepository->findAll(),
+                'project_categories' => $projectCategories,
+                'default_project_category' => $defaultProjectCategory,
                 'csrf_token_name' => self::TOKEN_FOR_PROJECT_GRID,
             ]
         );
