@@ -34,14 +34,6 @@ class User implements UserInterface
     private string $email;
 
     #[ORM\Column]
-    #[ApiProperty('is_admin')]
-    private bool $isAdmin;
-
-    #[ORM\Column]
-    #[ApiProperty('is_project_manager')]
-    private bool $isProjectManager;
-
-    #[ORM\Column]
     #[ApiProperty('is_contractor')]
     private bool $isContractor;
 
@@ -76,6 +68,10 @@ class User implements UserInterface
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private array $favoriteClients = [];
+
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    #[ApiProperty('access_roles')]
+    private array $accessRoles = [];
 
     public function __construct(int $id, string $firstName, string $lastName, string $email)
     {
@@ -125,14 +121,7 @@ class User implements UserInterface
 
     public function getIsAdmin(): bool
     {
-        return $this->isAdmin;
-    }
-
-    public function setIsAdmin(bool $isAdmin): self
-    {
-        $this->isAdmin = $isAdmin;
-
-        return $this;
+        return in_array('administrator', $this->accessRoles, true);
     }
 
     public function getIsProjectManager(): bool
@@ -173,13 +162,14 @@ class User implements UserInterface
 
     public function fixRoles(): void
     {
-        if ($this->isAdmin) {
+        if ($this->getIsAdmin()) {
             $this->roles[] = 'ROLE_ADMIN';
         }
 
-        if ($this->isProjectManager) {
-            $this->roles[] = 'ROLE_PROJECT_MANAGER';
-        }
+        // TODO
+//        if ($this->isProjectManager) {
+//            $this->roles[] = 'ROLE_PROJECT_MANAGER';
+//        }
 
         $this->roles = array_unique($this->roles);
     }
