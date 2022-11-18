@@ -46,7 +46,6 @@ Run the following commands:
 ```shell
 symfony console app:harvest:import:clients
 symfony console app:harvest:import:users
-symfony console app:harvest:import:users
 symfony console app:harvest:import:tasks
 symfony console app:harvest:import:projects
 symfony console app:harvest:import:project-budgets
